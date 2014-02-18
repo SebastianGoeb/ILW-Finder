@@ -25,3 +25,4 @@ def getPostcodes():
     output = StringIO()
     data = [x.to_dict() for x in Postcodes.get()]
     json.dump(data,output)
+    return output.getvalue()
