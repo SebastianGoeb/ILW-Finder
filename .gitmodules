@@ -1,0 +1,6 @@
+[submodule "datasets"]
+	path = datasets
+	url = https://github.com/edinburghcouncil/datasets
+[submodule "natural-neighbourhoods"]
+	path = natural-neighbourhoods
+	url = https://github.com/edinburghcouncil/natural-neighbourhoods
