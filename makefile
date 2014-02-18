@@ -13,6 +13,10 @@ SRC = ./src
 all:
 	echo TODO make all
 
+.PHONY: deps
+deps:
+	pip2 install Flask -t $(SRC)/lib
+
 # Start the local App Engine server
 # accessed via http://localhost:8080
 .PHONY: demo

@@ -1,5 +1,8 @@
 # Google App Engine specific SDK
 google_appengine/
 
+# Dependencies
+src/lib/
+
 # Compiled python sources
 *.pyc
