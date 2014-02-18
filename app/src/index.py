@@ -26,7 +26,6 @@ def index():
     return render_template("main.html",
                                                  lat = 55.95, lon = -3.2,
                                                  postcode = "EH1 1LY")
-
 # @app.route('/updatedb/dz/<indicator>')
 # def route_updatedb_dz():
 #     return
@@ -54,7 +53,7 @@ def index():
 #     output = StringIO()
 #     data = [x.to_dict() for x in District.get().fetch()]
 #     return retJson(data)
-    
+
 # @app.route('/get/persons')
 # def getPersons():
 #     output = StringIO()
