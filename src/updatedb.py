@@ -26,8 +26,8 @@ def scrape_neighbourhoods():
 				i_row += 1
 				Postcodes(id = int(i_row-1),
 									postcode = row[3].replace(' ', '').upper(),
-									x_coord = int(row[4]) % 1000000 / 10,
-									y_coord = int(row[5]) % 1000000 / 10).put()
+									x_coord = int(row[4]),
+									y_coord = int(row[5])).put()
 			except ValueError as e:
 				logging.error("ValueErrror: at "+str(i_row)+" ("+' '.join(e.args)+")")
 	logging.info("Finished scraping neighbourhoods. "

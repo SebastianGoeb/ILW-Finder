@@ -4,11 +4,17 @@ from google.appengine.ext import ndb
 import simplejson as json
 from StringIO import StringIO
 
+from coords import *
+
 app = Flask(__name__)
 
 @app.route('/')
 def index():
-	return render_template("main.html")
+	postcode = Postcodes.get()[0]
+	r = GeoRef.fromGridRef(GridRef(postcode.x_coord, postcode.y_coord))
+	return render_template("main.html",
+												 lat = r.latitude, lon = r.longitude,
+												 postcode = postcode.postcode)
 
 @app.route('/test')
 def testing():
