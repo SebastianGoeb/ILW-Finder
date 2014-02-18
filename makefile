@@ -38,3 +38,7 @@ demo-wipe:
 .PHONY: push
 push:
 	$(APPCFG) update $(SRC)
+
+.PHONY: updatedb
+updatedb:
+	$(APPCFG) backends $(SRC) start updatedb

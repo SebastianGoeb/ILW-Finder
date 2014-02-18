@@ -5,12 +5,11 @@ from google.appengine.ext import ndb
 import simplejson as json
 from StringIO import StringIO
 
-
 app = Flask(__name__)
 
 @app.route('/')
 def index():
-	return 'Index cia Flask'
+	return getPostcodes()
 
 
 @app.route('/get/postcodes')
