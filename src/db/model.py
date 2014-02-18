@@ -2,15 +2,24 @@ from google.appengine.ext import ndb
 
 # ndb database classes
 class Postcodes (ndb.Model):
-    postcode = ndb.StringProperty()
-    x_coord = ndb.IntegerProperty()
-    y_coord = ndb.IntegerProperty()
+	postcode = ndb.StringProperty()
+	x_coord = ndb.IntegerProperty()
+	y_coord = ndb.IntegerProperty()
+	datazone = ndb.IntegerProperty()
     
-    @classmethod
-    def get(cls):
-        return cls.query()
-    def by_id(cls, id):
-        return cls.Key(Postcodes, id).get()
+	@classmethod
+	def get(cls):
+		return cls.query()
+	def by_id(cls, id):
+		return cls.Key(Postcodes, id).get()
+
+class DataZone (ndb.Model):
+	id = ndb.IntegerProperty()
+
+	@classmethod
+	def get(cls):
+		return cls.query()
+		
 
 class District (ndb.Model):
     name = ndb.StringProperty()

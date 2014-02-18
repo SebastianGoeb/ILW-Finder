@@ -9,3 +9,7 @@ src/lib/
 
 # Emacs backups
 .#*
+
+# Local data
+src/db-population
+src/data/

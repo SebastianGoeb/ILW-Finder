@@ -19,6 +19,7 @@ clean:
 
 .PHONY: deps
 deps:
+	mkdir $(SRC)/lib
 	pip2 install Flask -t $(SRC)/lib
 	pip2 install simplejson -t $(SRC)/lib
 
@@ -26,7 +27,7 @@ deps:
 # accessed via http://localhost:8080
 .PHONY: demo
 demo:
-	$(APPSERVER) $(SRC)
+	$(APPSERVER) $(SRC) 
 
 # Return the local App Engine to a clean slate,
 # i.e. wipe local database. Does not touch any

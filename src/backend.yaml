@@ -1,0 +1,19 @@
+application: ilw-finder
+version: 1
+module: backend
+runtime: python27
+api_version: 1
+threadsafe: false
+instance_class: B8
+
+basic_scaling:
+  idle_timeout: 10m
+
+libraries:
+- name: webapp2
+  version: latest
+
+handlers:
+- url: /_ah/start
+  script: backend.init
+
