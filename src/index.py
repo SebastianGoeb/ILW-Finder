@@ -15,7 +15,7 @@ def retJson(obj):
 
 @app.route('/')
 def index():
-	postcode = Postcodes.get()[0]
+	postcode = Postcodes.get().fetch()[0]
 	r = GeoRef.fromGridRef(GridRef(postcode.x_coord, postcode.y_coord))
 	return render_template("main.html",
 												 lat = r.latitude, lon = r.longitude,
