@@ -8,6 +8,10 @@ handlers:
 - url: /.*
   script: index.app
 
-- url: /csv
-  static_dir: csv
+- url: /db-datasets
+  static_dir: datasets
+  application_readable: true
+
+- url: /db-nat-neigh
+  static_dir: natural-neighbourhoods
   application_readable: true

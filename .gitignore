@@ -6,3 +6,6 @@ src/lib/
 
 # Compiled python sources
 *.pyc
+
+# Emacs backups
+.#*
