@@ -15,7 +15,7 @@ all:
 
 .PHONY: clean
 clean:
-	rm -f src/*.pyc
+	rm -f $(find -name "src/*.pyc")
 
 .PHONY: deps
 deps:
