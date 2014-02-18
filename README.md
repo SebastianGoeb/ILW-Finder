@@ -8,7 +8,9 @@ An interactive map to determine communities/natural neighbourhoods in Edinburgh 
 
 * Python 2.7 (i.e. package python2)
 
-* pip for Python 2.7 (to install Flask)
+* pip2 dependencies:
+> Flask
+> simplejson
 
 * make
 
