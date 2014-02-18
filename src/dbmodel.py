@@ -1,26 +1,61 @@
 from google.appengine.ext import ndb
 
 # ndb database classes
-class PostCode (ndb.Model):
-    id = int()
-    postocde = ndb.StringProperty(indexed=False)
-    x_coord = float()
-    y_coords = float()
+class Postcodes (ndb.Model):
+    id = ndb.IntegerProperty()
+    postcode = ndb.StringProperty()
+    x_coord = ndb.FloatProperty()
+    y_coord = ndb.FloatProperty()
+    
+    @classmethod
+    def get(cls):
+        return cls.query().fetch()
+    @classmethod
+    def get_id(cls, id):
+        return cls.query().fetch(1)
 
 class District (ndb.Model):
-    id = int()
+    id = ndb.IntegerProperty()
     name = ndb.StringProperty(indexed = False)
+    
+    @classmethod
+    def get(cls):
+        return cls.query().fetch()
+    @classmethod
+    def get_id(cls, id):
+        return cls.query().fetch(1)
 
 class Person (ndb.Model):
-    id = int()
-    district_id = int()
-    postcode_id = int()
+    id = ndb.IntegerProperty()
+    district_id = ndb.IntegerProperty()
+    postcode_id = ndb.IntegerProperty()
+    
+    @classmethod
+    def get(cls):
+        return cls.query().fetch()
+    @classmethod
+    def get_id(cls, id):
+        return cls.query().fetch(1)
 
 class PlaceCat(ndb.Model):
-    id = int()
-    cat_name = ndb.StringProperty(indexed = False)
+    id = ndb.IntegerProperty()
+    cat_name = ndb.StringProperty()
+    
+    @classmethod
+    def get(cls):
+        return cls.query().fetch()
+    @classmethod
+    def get_id(cls, id):
+        return cls.query().fetch(1)
     
 class PublicPlace(ndb.Model):
-    id = int()
-    cat_id = int()
-    postcode_id = int()
+    id = ndb.IntegerProperty()
+    cat_id = ndb.IntegerProperty()
+    postcode_id = ndb.IntegerProperty()
+    
+    @classmethod
+    def get(cls):
+        return cls.query().fetch()
+    @classmethod
+    def get_id(cls, id):
+        return cls.query().fetch(1)
