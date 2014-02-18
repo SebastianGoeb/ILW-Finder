@@ -25,11 +25,11 @@ def scrape_neighbourhoods():
 				# TODO: coordinates. What is their current meaning?
 				i_row += 1
 				Postcodes(id = int(i_row-1),
-									postcode = row[3].replace(' ', ''),
-									x_coord = int(row[4]),
-									y_coord = int(row[5])).put()
+									postcode = row[3].replace(' ', '').upper(),
+									x_coord = int(row[4])*100,
+									y_coord = int(row[5])*100).put()
 			except ValueError as e:
-				logging.error("ValueErrror: at "+str(i_row)+" in ("+' '.join(e.args)+")")
+				logging.error("ValueErrror: at "+str(i_row)+" ("+' '.join(e.args)+")")
 	logging.info("Finished scraping neighbourhoods. "
 							 + str(i_row - 1)  + " entries total")
 
