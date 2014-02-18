@@ -8,14 +8,20 @@ class Postcodes (ndb.Model):
     
     @classmethod
     def get(cls):
-        return cls.query().fetch()
+        return cls.query()
+    def by_id(cls, id):
+        return cls.Key(Postcodes, id).get()
 
 class District (ndb.Model):
-    name = ndb.StringProperty(indexed = False)
+    name = ndb.StringProperty()
+    x_coord = ndb.IntegerProperty()
+    y_coord = ndb.IntegerProperty()
     
     @classmethod
     def get(cls):
-        return cls.query().fetch()
+        return cls.query()
+    def by_id(cls, id):
+        return cls.key(District, id).get()
 
 class Person (ndb.Model):
     district_id = ndb.IntegerProperty()
@@ -23,14 +29,14 @@ class Person (ndb.Model):
     
     @classmethod
     def get(cls):
-        return cls.query().fetch()
+        return cls.query()
 
 class PlaceCat(ndb.Model):
     cat_name = ndb.StringProperty()
     
     @classmethod
     def get(cls):
-        return cls.query().fetch()
+        return cls.query()
     
 class PublicPlace(ndb.Model):
     cat_id = ndb.IntegerProperty()
@@ -38,4 +44,4 @@ class PublicPlace(ndb.Model):
     
     @classmethod
     def get(cls):
-        return cls.query().fetch()
+        return cls.query()
