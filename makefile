@@ -20,6 +20,7 @@ clean:
 .PHONY: deps
 deps:
 	pip2 install Flask -t $(SRC)/lib
+	pip2 install simplejson -t $(SRC)/lib
 
 # Start the local App Engine server
 # accessed via http://localhost:8080
