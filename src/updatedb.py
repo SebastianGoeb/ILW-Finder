@@ -18,13 +18,18 @@ def scrape_neighbourhoods():
 	with open('db-nat-neigh/Survey Data.csv', 'r') as f_in:
 		f = csv.reader(f_in)
 		for row in f:
-			if i_row == 0:
-				i_row += 1
-				continue								# skip header row
-			i_row += 1
+			try:
+				if i_row == 0:
+					i_row += 1
+					continue								# skip header row
 				# TODO: coordinates. What is their current meaning?
-			Postcodes(id = int(i_row-1),
-								postcode = row[3].replace(' ', '')).put()
+				i_row += 1
+				Postcodes(id = int(i_row-1),
+									postcode = row[3].replace(' ', ''),
+									x_coord = int(row[4]),
+									y_coord = int(row[5])).put()
+			except ValueError as e:
+				logging.error("ValueErrror: at "+str(i_row)+" in ("+' '.join(e.args)+")")
 	logging.info("Finished scraping neighbourhoods. "
 							 + str(i_row - 1)  + " entries total")
 
