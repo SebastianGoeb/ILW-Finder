@@ -11,8 +11,8 @@ def updatedb():
 	scrape_neighbourhoods()
 		
 def scrape_neighbourhoods():
-	if Postcodes.get():
-		return											# Database already populated
+#	if Postcodes.get():
+#		return											# Database already populated
 	i_row = 0
 	logging.info("Scraping neighbourhoods...")
 	with open('db-nat-neigh/Survey Data.csv', 'r') as f_in:
