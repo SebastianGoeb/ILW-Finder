@@ -9,7 +9,7 @@ class OkHandler(webapp2.RequestHandler):
 		self.response.out.write("ok")
 
 main = webapp2.WSGIApplication([
-	('/test/ok', OkHandler)
+	('/test/ok', OkHandler),
 	('/updatedb/pc', postcodes.UpdateDB)
 	])
 

@@ -12,8 +12,9 @@ class UpdateDB(webapp2.RequestHandler):
 	def update(self):
 		logging.info("Updating PostCode data from local Council Data")
 		n_pcs = 0
-		with csv.DictReader(open('db-nat-neigh/Survey Data.csv', 'r')) as f:
-			for row in f:
+		with open('db-nat-neigh/Survey Data.csv', 'r') as f_in:
+			csv_in = csv.DictReader(f_in)
+			for row in csv_in:
 				try:
 					model.Postcodes(postcode = row["Pcode"].replace(' ', '').upper(),
 													x_coord = int(row["Xcord"]),
@@ -21,5 +22,6 @@ class UpdateDB(webapp2.RequestHandler):
 													datazone = 0).put()
 					n_pcs += 1
 				except Exception as e:
-					logging.error("Exception: at "+str(i_row)+" ("+' '.join(e.args)+")")
-		logging.info("Successfully read " + n_pcs  + " entries")
+					logging.warning("Exception: at %i (%s)"
+													% (n_pcs, ' '.join(e.args)))
+		logging.info("Successfully read %i entries" % (n_pcs))
