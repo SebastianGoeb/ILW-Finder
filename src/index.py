@@ -1,4 +1,5 @@
 from flask import Flask
+
 from google.appengine.ext import ndb
 
 app = Flask(__name__)
@@ -6,7 +7,9 @@ app = Flask(__name__)
 @app.route('/')
 def index():
 	return 'Index cia Flask'
-
+	f = open('csv/neighbourhoods.csv', 'r')
+	
+	return f.readline()
 
 # ndb database classes
 class PostCode (ndb.Model):

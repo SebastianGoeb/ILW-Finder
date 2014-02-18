@@ -13,6 +13,10 @@ SRC = ./src
 all:
 	echo TODO make all
 
+.PHONY: clean
+clean:
+	rm -f src/*.pyc
+
 .PHONY: deps
 deps:
 	pip2 install Flask -t $(SRC)/lib
