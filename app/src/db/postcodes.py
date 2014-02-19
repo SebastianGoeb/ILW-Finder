@@ -8,13 +8,13 @@ from db import model
 
 class UpdateDB(webapp2.RequestHandler):
 	def get(self):
-		background_thread.start_new_background_thread(self.update, [])
+		self.update()
 		self.response.out.write('finished postcodes.UpdateDB')
 
 	def update(self):
 		logging.info("Updating PostCode data from local Council Data")
 		n_pcs = 0
-		with open('db-nat-neigh/Survey Data.csv', 'r') as f_in:
+		with open('data/natural-neighbourhoods-survey.csv', 'r') as f_in:
 			csv_in = csv.DictReader(f_in)
 			for row in csv_in:
 				try:

@@ -3,8 +3,13 @@ from db import model
 from google.appengine.ext import ndb
 import simplejson as json
 from StringIO import StringIO
+import sys
+import os.path
+import logging
 
 from coords import *
+
+logging.getLogger().setLevel(logging.DEBUG)
 
 app = Flask(__name__)
 

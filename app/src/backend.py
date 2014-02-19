@@ -1,7 +1,7 @@
 import webapp2
 import logging
 
-from db import postcodes
+from db import postcodes, fetch
 
 class OkHandler(webapp2.RequestHandler):
 	def get(self):
@@ -10,7 +10,8 @@ class OkHandler(webapp2.RequestHandler):
 
 main = webapp2.WSGIApplication([
 	('/test/ok', OkHandler),
-	('/updatedb/pc', postcodes.UpdateDB)
+	('/updatedb/pc', postcodes.UpdateDB),
+	('/get/.*', fetch.Main)
 	])
 
 init = webapp2.WSGIApplication([

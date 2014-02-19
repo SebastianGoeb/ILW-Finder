@@ -15,5 +15,5 @@ libraries:
 
 handlers:
 - url: /_ah/start
-  script: backend.init
+  script: src.backend.init
 

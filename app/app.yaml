@@ -5,22 +5,21 @@ api_version: 1
 threadsafe: false
 
 handlers:
-- url: /db-datasets
-  static_dir: db-datasets
-  application_readable: true
-
-- url: /db-nat-neigh
-  static_dir: db-nat-neigh
+- url: /data/.*
+  static_dir: data
   application_readable: true
 
 - url: /test/.*
-  script: backend.main
+  script: src.backend.main
 
 - url: /updatedb/.*
-  script: backend.main
+  script: src.backend.main
+
+- url: /get/.*
+  script: src.backend.main
 
 - url: /.*
-  script: index.app
+  script: src.index.app
 
 libraries:
 - name: webapp2
