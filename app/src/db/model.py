@@ -33,7 +33,7 @@ class Postcodes (ndb.Model):
         for postcode in cls.query().fetch():
             ret = {}
             ret["postcode"] = postcode.postcode
-            ret["distrct_name"] = postcode.district
+            ret["district_name"] = postcode.district
             ret["lat"] = postcode.lat
             ret["long"] = postcode.long
             place_posts = PlacePostRel.query(postcode.id == PlaceZoneRel.postcode_id).fetch()
