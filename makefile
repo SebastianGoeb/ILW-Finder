@@ -2,12 +2,12 @@
 ## The google app engine SDK is *not* committed to the repo. You can find it at
 ## https://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python
 ## Recommended Python version 2.7
-SDK = ./google_appengine
+SDK = google_appengine
 
 APPCFG = python2 $(SDK)/appcfg.py
 APPSERVER = python2 $(SDK)/dev_appserver.py
 
-APP = ./app
+APP = app
 SRC = $(APP)/src
 LIB = $(APP)/lib
 
@@ -17,7 +17,7 @@ all:
 
 .PHONY: clean
 clean:
-	rm -f $(find $(SRC) -name "*.pyc")
+	rm -f $(find $(SRC) -iname '*.pyc')
 
 .PHONY: deps
 deps:
