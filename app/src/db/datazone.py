@@ -62,11 +62,15 @@ def ods_query(fmt):
 
 class UpdateDB(webapp2.RequestHandler):
     def get(self):
-        deferred.defer(update)
+        deferred.defer(update_dz)
+        deferred.defer(update_pop)
         self.response.out.write('finished datazone.UpdateDB')
 
 def dz_parseCode(s):
     return int(s.split(' ')[-1][1:])
+
+def dz_parseCsvCode(s):
+    return int(s[1:])
 
 def pc_fromStr(s):
     return s.replace(' ', '').upper()
@@ -74,7 +78,7 @@ def pc_fromStr(s):
 def reformat_postcode(s):
     return s[:-3]  + ' ' + s[-3:]
 
-def update():
+def update_dz():
     logging.info("Updating Datazones from Open Data Scotland")
     f_in = StringIO(ods_query(sparql_edinDatazone))
     csv_in = csv.DictReader(f_in)
@@ -126,3 +130,22 @@ def update():
         n_codes += 1
         p.put()
     logging.info("Inferred %i datazones for postcodes" % (n_codes))
+
+def update_pop():
+    logging.info("Updating population data")
+    n_pop = 0
+    with open('data/datazone-population.csv', 'r') as f_in:
+        csv_in = csv.DictReader(f_in)
+        for row in csv_in:
+            zone = model.Datazone.query(
+                model.Datazone.code
+                == dz_parseCsvCode(row['GeographyCode'])
+            ).fetch()
+            for z in zone:
+                z.pop_total = int(row['GR-denominatorindP'])
+                z.pop_child = int(z.pop_total * float(row['GR-Percchild'])/100)
+                z.pop_pens = int(z.pop_total * float(row['GR-Percpens'])/100)
+                z.pop_work = int(z.pop_total * float(row['GR-Percwork'])/100)
+                n_pop += 1
+                z.put()
+    logging.info("Done. Altered %i entries."%(n_pop))
