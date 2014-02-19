@@ -7,7 +7,9 @@ SDK = ./google_appengine
 APPCFG = python2 $(SDK)/appcfg.py
 APPSERVER = python2 $(SDK)/dev_appserver.py
 
-SRC = ./src
+APP = ./app
+SRC = $(APP)/src
+LIB = $(APP)/lib
 
 .PHONY: all
 all:
@@ -15,32 +17,28 @@ all:
 
 .PHONY: clean
 clean:
-	rm -f $(find -name "src/*.pyc")
+	rm -f $(find $(SRC) -name "*.pyc")
 
 .PHONY: deps
 deps:
-	mkdir $(SRC)/lib
-	pip2 install Flask -t $(SRC)/lib
-	pip2 install simplejson -t $(SRC)/lib
+	mkdir $(LIB)
+	pip2 install Flask -t $(LIB)
+	pip2 install simplejson -t $(LIB)
 
 # Start the local App Engine server
 # accessed via http://localhost:8080
 .PHONY: demo
 demo:
-	$(APPSERVER) $(SRC) 
+	$(APPSERVER) $(APP) 
 
 # Return the local App Engine to a clean slate,
 # i.e. wipe local database. Does not touch any
 # additional downloaded resources (e.g. Council data).
 .PHONY: demo-wipe
 demo-wipe:
-	$(APPSERVER) --clear_datastore=yes $(SRC)
+	$(APPSERVER) --clear_datastore=yes $(APP)
 
 # Push the source tree up to App Engine
 .PHONY: push
 push:
-	$(APPCFG) update $(SRC)
-
-.PHONY: updatedb
-updatedb:
-	$(APPCFG) backends $(SRC) start updatedb
+	$(APPCFG) update $(APP)

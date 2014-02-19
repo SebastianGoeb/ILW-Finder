@@ -2,7 +2,7 @@
 google_appengine/
 
 # Dependencies
-src/lib/
+app/lib/
 
 # Compiled python sources
 *.pyc
@@ -11,5 +11,5 @@ src/lib/
 .#*
 
 # Local data
-src/db-population
-src/data/
+app/db-population/
+app/data/

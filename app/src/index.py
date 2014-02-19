@@ -1,7 +1,6 @@
 from flask import Flask, render_template
-#from dbmodel import *
+from db import model
 from google.appengine.ext import ndb
-from google.appengine.api import taskqueue
 import simplejson as json
 from StringIO import StringIO
 
@@ -16,12 +15,11 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-	return 'Hello, world'
-	# postcode = Postcodes.get().fetch()[0]
-	# r = GeoRef.fromGridRef(GridRef(postcode.x_coord, postcode.y_coord))
-	# return render_template("main.html",
-	# 											 lat = r.latitude, lon = r.longitude,
-	# 											 postcode = postcode.postcode)
+	postcode = model.Postcodes.get().fetch()[0]
+	r = GeoRef.fromGridRef(GridRef(postcode.grid_x, postcode.grid_y))
+	return render_template("main.html",
+												 lat = r.latitude, lon = r.longitude,
+												 postcode = postcode.postcode)
 
 # @app.route('/updatedb/dz/<indicator>')
 # def route_updatedb_dz():

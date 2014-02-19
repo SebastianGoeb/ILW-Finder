@@ -2,11 +2,13 @@ import webapp2
 import logging
 import csv
 
+from google.appengine.api import background_thread
+
 from db import model
 
 class UpdateDB(webapp2.RequestHandler):
 	def get(self):
-		self.update()
+		background_thread.start_new_background_thread(self.update, [])
 		self.response.out.write('finished postcodes.UpdateDB')
 
 	def update(self):
@@ -17,8 +19,8 @@ class UpdateDB(webapp2.RequestHandler):
 			for row in csv_in:
 				try:
 					model.Postcodes(postcode = row["Pcode"].replace(' ', '').upper(),
-													x_coord = int(row["Xcord"]),
-													y_coord = int(row["Ycord"]),
+													grid_x = int(row["Xcord"]),
+													grid_y = int(row["Ycord"]),
 													datazone = 0).put()
 					n_pcs += 1
 				except Exception as e:

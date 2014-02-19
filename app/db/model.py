@@ -3,8 +3,8 @@ from google.appengine.ext import ndb
 # ndb database classes
 class Postcodes (ndb.Model):
 	postcode = ndb.StringProperty()
-	x_coord = ndb.IntegerProperty()
-	y_coord = ndb.IntegerProperty()
+	grid_x = ndb.IntegerProperty()
+	grid_y = ndb.IntegerProperty()
 	datazone = ndb.IntegerProperty()
     
 	@classmethod

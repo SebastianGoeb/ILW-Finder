@@ -1,0 +1,47 @@
+GeographyCode,"LA","ZN"
+Title,"Local Authority","Data Zone"
+AlternativeTitle,"",""
+DatasetLanguage,"English","English"
+Abstract," (http://www.lgbc-scotland.gov.uk/) . Ordnance Survey is responsible for producing map products which exactly locate local authority boundaries. Within SNS the 32 local authorities are defined in terms of 2001 data zones and statistics relating to these areas are 'best-fit'. Data zones were designed to nest within local authorities as at the time of the 2001 Census. The boundaries displayed within SNS have been produced by generalising local authority boundaries and are not exact. A look-up table which allows the user to match geography codes with geographic area names is available to download at: http://www.scotland.gov.uk/Topics/Statistics/sns/SNSRef/CodeName ]]>","The 6505 data zones have been created by combining 2001 Census output areas. Within SNS data zones are used as the building block to aggregate 'best-fit' statistics for Scottish Parliamentary Constituencies and Health Board Areas. The data zone geography covers the whole of Scotland and nests within local authority boundaries. Data zones have populations of between 500 and 1,000 household residents, and some effort has been made to respect physical boundaries. In addition, they have compact shape and contain households with similar social characteristics. Background information on the development and use of data zones can be found at http://www.scotland.gov.uk/library5/society/sndata-00.asp The boundaries displayed within SNS have been produced by aggregating census output area boundaries "
+TopicCategory,Test2,Test2
+Subject,"There are 32 local authorities in Scotland. This structure for local government was introduced in 31","The 6505 data zones have been created by combining 2001 Census output areas. Within SNS data zones are used as the building block to aggregate 'best-fit' statistics for Scottish Parliamentary Constituencies and Health Board Areas. The data zone geography covers the whole of Scotland and nests within local authority boundaries. Data zones have populations of between 500 and 1,000 household residents, and some effort has been made to respect physical boundaries. In addition, they have compact shape and contain households with similar social characteristics. Background information on the development and use of data zones can be found at http://www.scotland.gov.uk/library5/society/sndata-00.asp The boundaries displayed within SNS have been produced by aggregating census output area boundaries "
+Date,2001-01-01T00:00:00Z,2007-01-30T00:00:00Z
+DataSetReferenceDate,1900-01-01T00:00:00Z,1900-01-01T00:00:00Z
+Originator,"",""
+SouthBoundingCoordinate,3.141593,3.141593
+NorthBoundingCoordinate,3.141593,3.141593
+EastBoundingCoordinate,3.141593,3.141593
+WestBoundingCoordinate,3.141593,3.141593
+Lineage," ","2001 Census output areas"
+Extent,SC,CHA
+VerticalExtentMinimumValue,,
+VerticalExtentMaximumValue,,
+VerticalExtentUnitOfMeasure,"",""
+VerticalExtentVerticalDatum,"",""
+SpatialReferenceSystem,National Grid of Great Britain,National Grid of Great Britain
+SpatialResolution,,
+SpatialRepresentationType,,
+PresentationType,,
+DataFormat,"String","String"
+SupplyMedia,,
+Contact,"String","String"
+Name,"String","String"
+PostalAddress,"",""
+TelephoneNumber,"",""
+FacsimileNumber,"",""
+EmailAddress,"",""
+WebAddress,"String","String"
+FrequencyOfUpdate,unknown,continual
+AccessConstraint,,
+UseConstraints,,
+AdditionalInformationSource,"String","String"
+OnlineResource,,
+BrowseGraphic,"",""
+DateOfUpdateOfMetadata,2007-01-01T00:00:00Z,2007-01-30T00:00:00Z
+MetadataStandardVersion,"",""
+StandardsNamesAndCodes,"",""
+RelatedGeographies,"",""
+ReferenceIndex,"",""
+History,"",""
+UpdateRegime,"",""
+ActionRequired,"",""
