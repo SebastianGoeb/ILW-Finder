@@ -45,19 +45,20 @@ class Postcodes (ndb.Model):
                 ret["vals"].append(entry)
             results.append(ret)
         return results
-'''class Datazone (ndb.Model):
+
+class Datazone (ndb.Model):
     id = ndb.IntegerProperty(indexed = True)
-    name = ndb.StringProperty()
-    lat = ndb.IntegerProperty()
-    long = ndb.IntegerProperty()
+    code = ndb.IntegerProperty()
+    grid_x = ndb.IntegerProperty()
+    grid_y = ndb.IntegerProperty()
 
     @classmethod
     def get(cls):
         return cls.query()
 
     @classmethod
-    def by_name(cls, name):
-        return cls.query(cls.name == name)'''
+    def by_code(cls, name):
+        return cls.query(cls.code == name)
             
 '''class District (ndb.Model):
     name = ndb.StringProperty()

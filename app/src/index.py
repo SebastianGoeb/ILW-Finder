@@ -21,23 +21,23 @@ app.debug = True
 
 @app.route('/')
 def index():
-	#postcode = model.Postcodes.get().fetch()[0]
-	#r = GeoRef.fromGridRef(GridRef(postcode.grid_x, postcode.grid_y))
-	return render_template("main.html",
-												 lat = 55.95, lon = -3.2,
-												 postcode = "EH1 1LY")
+    #postcode = model.Postcodes.get().fetch()[0]
+    #r = GeoRef.fromGridRef(GridRef(postcode.grid_x, postcode.grid_y))
+    return render_template("main.html",
+                                                 lat = 55.95, lon = -3.2,
+                                                 postcode = "EH1 1LY")
 
 # @app.route('/updatedb/dz/<indicator>')
 # def route_updatedb_dz():
-# 	return
+#     return
 
 # @app.route('/updatedb/pc')
 # def route_updatedb_pc():
-# 	update_pc(reinit=True)
+#     update_pc(reinit=True)
 
 # @app.route('/backend/updatedb')
 # def updatedb():
-# 	taskqueue.add(name='updatedb')
+#     taskqueue.add(name='updatedb')
 
 # @app.route('/test')
 # def testing():
