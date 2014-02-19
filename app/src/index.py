@@ -12,6 +12,7 @@ from coords import *
 logging.getLogger().setLevel(logging.DEBUG)
 
 app = Flask(__name__)
+app.debug = True
 
 # def retJson(obj):
 #     output = StringIO()
@@ -20,11 +21,11 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-	postcode = model.Postcodes.get().fetch()[0]
-	r = GeoRef.fromGridRef(GridRef(postcode.grid_x, postcode.grid_y))
+	#postcode = model.Postcodes.get().fetch()[0]
+	#r = GeoRef.fromGridRef(GridRef(postcode.grid_x, postcode.grid_y))
 	return render_template("main.html",
-												 lat = r.latitude, lon = r.longitude,
-												 postcode = postcode.postcode)
+												 lat = 55.95, lon = -3.2,
+												 postcode = "EH1 1LY")
 
 # @app.route('/updatedb/dz/<indicator>')
 # def route_updatedb_dz():
