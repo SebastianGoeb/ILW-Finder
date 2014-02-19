@@ -12,7 +12,7 @@ class UpdateDB(webapp2.RequestHandler):
 		self.response.out.write('postcodes.UpdateDB')
 
 def update():
-	logging.info("Updating PostCode data from local Council Data")
+	logging.info("Updating Postcode data from local Council Data")
 	n_pcs = 0
 	with open('data/natural-neighbourhoods-survey.csv', 'r') as f_in:
 		csv_in = csv.DictReader(f_in)
@@ -21,7 +21,7 @@ def update():
 				model.Postcodes(postcode = row["Pcode"].replace(' ', '').upper(),
 												grid_x = int(row["Xcord"]),
 												grid_y = int(row["Ycord"]),
-												datazone = 0).put()
+												datazone_id = 0).put()
 				n_pcs += 1
 			except Exception as e:
 				logging.warning("Exception: at %i (%s)"

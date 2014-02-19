@@ -17,7 +17,7 @@ class GeoRef():
 		E = ref.x
 		N = ref.y
 
-		logging.info("Conversion from N " + str(E) + ", E " + str(N))
+#		logging.info("Conversion from N " + str(E) + ", E " + str(N))
 		
 		a = 6377563.396
 		b = 6356256.910

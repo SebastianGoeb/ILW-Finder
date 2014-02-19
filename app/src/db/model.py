@@ -5,13 +5,24 @@ class Postcodes (ndb.Model):
 	postcode = ndb.StringProperty()
 	grid_x = ndb.IntegerProperty()
 	grid_y = ndb.IntegerProperty()
-	datazone = ndb.IntegerProperty()
+	datazone_id = ndb.IntegerProperty()
     
 	@classmethod
 	def get(cls):
 		return cls.query()
+
+	@classmethod
 	def by_id(cls, id):
-		return cls.Key(Postcodes, id).get()
+		# return cls.Key(Postcodes, id).get()
+		return cls.query(cls.id == id)
+
+	@classmethod
+	def by_datazone(cls, dz):
+		return cls.query(cls.datazone == dz.id)
+
+	@classmethod
+	def by_postcode(cls, pc):
+		return cls.query(cls.postcode == pc)
 
 class Datazone (ndb.Model):
 	name = ndb.IntegerProperty()
@@ -19,7 +30,11 @@ class Datazone (ndb.Model):
 	@classmethod
 	def get(cls):
 		return cls.query()
-		
+
+	@classmethod
+	def by_name(cls, name):
+		return cls.query(cls.name == name)
+			
 
 class District (ndb.Model):
     name = ndb.StringProperty()
