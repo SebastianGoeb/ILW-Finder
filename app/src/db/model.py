@@ -4,11 +4,11 @@ from google.appengine.ext import ndb
 
 
 class Postcodes (ndb.Model):
-    id = ndb.IntegerProperty()
-    postcode = ndb.StringProperty()
-    x = ndb.IntegerProperty()
-    y = ndb.IntegerProperty()
-    district = ndb.StringProperty()
+	postcode = ndb.StringProperty()
+	grid_x = ndb.IntegerProperty()
+	grid_y = ndb.IntegerProperty()
+	datazone_id = ndb.IntegerProperty()
+	district = ndb.StringProperty()
     
     @classmethod
     def get(cls):

@@ -18,11 +18,13 @@ def update():
 		csv_in = csv.DictReader(f_in)
 		for row in csv_in:
 			try:
-				model.Postcodes(postcode = row["Pcode"].replace(' ', '').upper(),
-												grid_x = int(row["Xcord"]),
-												grid_y = int(row["Ycord"]),
-												datazone_id = 0).put()
-				n_pcs += 1
+				if (int(row["Xcord"]) != 0 and int(row["Ycord"]) != 0):
+					model.Postcodes(postcode = row["Pcode"].replace(' ', '').upper(),
+													grid_x = int(row["Xcord"]),
+													grid_y = int(row["Ycord"]),
+													datazone_id = 0,
+													district = row["Allocated  NN"]).put()
+					n_pcs += 1
 			except Exception as e:
 				logging.warning("Exception: at %i (%s)"
 												% (n_pcs, ' '.join(e.args)))
