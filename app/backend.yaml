@@ -13,6 +13,9 @@ libraries:
 - name: webapp2
   version: latest
 
+builtins:
+- deferred: on
+
 handlers:
 - url: /_ah/start
   script: src.backend.init

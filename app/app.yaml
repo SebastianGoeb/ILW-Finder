@@ -24,3 +24,6 @@ handlers:
 libraries:
 - name: webapp2
   version: latest
+
+builtins:
+- deferred: on
