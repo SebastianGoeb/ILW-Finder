@@ -2,7 +2,6 @@ import webapp2
 import logging
 import csv
 
-from google.appengine.api import background_thread
 from google.appengine.ext import deferred
 
 from db import model
@@ -10,7 +9,7 @@ from db import model
 class UpdateDB(webapp2.RequestHandler):
 	def get(self):
 		deferred.defer(update)
-		self.response.out.write('finished postcodes.UpdateDB')
+		self.response.out.write('postcodes.UpdateDB')
 
 def update():
 	logging.info("Updating PostCode data from local Council Data")

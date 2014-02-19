@@ -13,8 +13,8 @@ class Postcodes (ndb.Model):
 	def by_id(cls, id):
 		return cls.Key(Postcodes, id).get()
 
-class DataZone (ndb.Model):
-	id = ndb.IntegerProperty()
+class Datazone (ndb.Model):
+	name = ndb.IntegerProperty()
 
 	@classmethod
 	def get(cls):
