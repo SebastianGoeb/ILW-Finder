@@ -84,3 +84,9 @@ class GridRef():
 	def __init__(self, x, y):
 		self.x = x
 		self.y = y
+
+	def range(self, a):
+		assert type(y) == GridRef, "argument must be a GridRef"
+		dx = a.x - self.x
+		dy = a.y - self.y
+		return sqrt(dx*dx+dy*dy)

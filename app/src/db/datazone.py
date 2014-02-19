@@ -14,13 +14,16 @@ sparql_edinPostcodeDatazone = """
 PREFIX label: <http://www.w3.org/2000/01/rdf-schema#label>
 PREFIX geoDataZone: <http://data.opendatascotland.org/def/geography/dataZone>
 PREFIX inDistrict: <http://data.ordnancesurvey.co.uk/ontology/admingeo/inDistrict>
-SELECT ?dzLabel ?pcLabel WHERE {
+PREFIX spatial: <http://data.ordnancesurvey.co.uk/ontology/spatialrelations/>
+SELECT ?dzLabel ?dzGridX ?dzGridY ?pcLabel WHERE {
 ?pc a <http://data.ordnancesurvey.co.uk/ontology/postcode/PostcodeUnit>;
     label: ?pcLabel;
     geoDataZone: ?dz.
 ?dz a <http://data.opendatascotland.org/def/geography/DataZone>;
     label: ?dzLabel;
     inDistrict: <http://statistics.data.gov.uk/id/statistical-geography/S12000036>;
+    spatial:easting ?dzGridX;
+    spatial:northing ?dzGridY.
 }
 """
 
@@ -46,14 +49,21 @@ def update():
 	n_rows = 0
 	for row in csv_in:
 		dzNo = dzNum_fromStr(row["dzLabel"])
-		if len(model.Datazone.by_name(dzNo).fetch()) == 0:
-			model.Datazone(name=dzNo).put()
+		dzs = model.Datazone.by_name(dzNo).fetch()
+		if len(dz) == 0:
+			dzs.append(model.Datazone(name=dzNo))
+		for dz in dzs:
+			dz.grid_x = int(row["dzGridX"])
+			dz.grid_y = int(row["dzGridY"])
+			dz.put()
+		
+		
 #		else:
 #			dzId = model.Datazone.by_name(dzNo).fetch(1)[0].key.id()
-		pc = model.Postcodes.by_postcode(pc_fromStr(row["pcLabel"])).fetch(1)
-		if len(pc) > 0:
-			pc[0].datazone_id = dzNo
-			pc[0].put()
+		pc = model.Postcodes.by_postcode(pc_fromStr(row["pcLabel"])).fetch()
+		for x in pc:
+			x.datazone_id = dzNo
+			x.put()
 		# pcs = model.Postcodes.by_postcode(row["pcLabel"]).key.get()
 		
 #		pcs.datazone_id = dzId

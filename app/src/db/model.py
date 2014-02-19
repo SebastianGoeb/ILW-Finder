@@ -26,6 +26,8 @@ class Postcodes (ndb.Model):
 
 class Datazone (ndb.Model):
 	name = ndb.IntegerProperty()
+	grid_x = ndb.IntegerProperty()
+	grid_y = ndb.IntegerProperty()
 
 	@classmethod
 	def get(cls):
