@@ -20,11 +20,11 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-	postcode = model.Postcodes.get().fetch()[0]
-	r = GeoRef.fromGridRef(GridRef(postcode.grid_x, postcode.grid_y))
-	return render_template("main.html",
-												 lat = r.latitude, lon = r.longitude,
-												 postcode = postcode.postcode)
+	#postcode = model.Postcodes.get().fetch()[0]
+	#r = GeoRef.fromGridRef(GridRef(postcode.grid_x, postcode.grid_y))
+	return render_template("main.html")#,
+										#		 lat = r.latitude, lon = r.longitude,
+										#		 postcode = postcode.postcode)
 
 # @app.route('/updatedb/dz/<indicator>')
 # def route_updatedb_dz():
@@ -53,7 +53,7 @@ def index():
 #     output = StringIO()
 #     data = [x.to_dict() for x in District.get().fetch()]
 #     return retJson(data)
-    
+
 # @app.route('/get/persons')
 # def getPersons():
 #     output = StringIO()
