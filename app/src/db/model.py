@@ -52,6 +52,11 @@ class Datazone (ndb.Model):
     grid_x = ndb.IntegerProperty()
     grid_y = ndb.IntegerProperty()
 
+    pop_total = ndb.IntegerProperty()
+    pop_child = ndb.IntegerProperty()
+    pop_pens = ndb.IntegerProperty()
+    pop_work = ndb.IntegerProperty()
+
     @classmethod
     def get(cls):
         return cls.query()
