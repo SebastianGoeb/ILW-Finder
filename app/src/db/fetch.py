@@ -1,5 +1,6 @@
 from flask import Flask
 from StringIO import StringIO
+import simplejson as json
 
 from db import model
 

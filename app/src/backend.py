@@ -11,7 +11,7 @@ class OkHandler(webapp2.RequestHandler):
 main = webapp2.WSGIApplication([
 	('/test/ok', OkHandler),
 	('/updatedb/pc', postcodes.UpdateDB),
-	('/get/.*', fetch.Main)
+#	('/get/.*', fetch.Main)
 	])
 
 init = webapp2.WSGIApplication([

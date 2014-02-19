@@ -16,7 +16,7 @@ handlers:
   script: src.backend.main
 
 - url: /get/.*
-  script: src.backend.main
+  script: src.db.fetch.Main
 
 - url: /.*
   script: src.index.app
