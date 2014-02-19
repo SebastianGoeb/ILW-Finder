@@ -50,7 +50,7 @@ def update():
 	for row in csv_in:
 		dzNo = dzNum_fromStr(row["dzLabel"])
 		dzs = model.Datazone.by_name(dzNo).fetch()
-		if len(dz) == 0:
+		if len(dzs) == 0:
 			dzs.append(model.Datazone(name=dzNo))
 		for dz in dzs:
 			dz.grid_x = int(row["dzGridX"])
