@@ -6,6 +6,7 @@ class Postcodes (ndb.Model):
 	grid_x = ndb.IntegerProperty()
 	grid_y = ndb.IntegerProperty()
 	datazone_id = ndb.IntegerProperty()
+	district = ndb.StringProperty()
     
 	@classmethod
 	def get(cls):

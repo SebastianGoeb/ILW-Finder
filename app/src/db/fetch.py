@@ -21,13 +21,19 @@ def get_postcodes():
 	data = [x.to_dict()["postcode"] for x in model.Postcodes.get().fetch()]
 	return retJson(data)
 
+@Main.route('/get/district/of-postcodes')
+def get_distOfPc():
+	data = model.Postcodes.get().fetch()
+	data = {x.postcode: x.district for x in data}
+	return retJson(data)
+		
 @Main.route('/get/georef/of-postcodes')
 def get_grOfPcs():
 	data = model.Postcodes.get().fetch()
 	def f_(x):
 		r = GeoRef.fromGridRef(GridRef(x.grid_x, x.grid_y))
 		return [r.latitude, r.longitude]
-	data = [f_(x) for x in data]
+	data = {x.postcode: f_(x) for x in data}
 	return retJson(data)
 
 @Main.route('/get/georef/of-postcode/<string:pc>')
