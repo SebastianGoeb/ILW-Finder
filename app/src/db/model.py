@@ -57,6 +57,8 @@ class Datazone (ndb.Model):
     pop_pens = ndb.IntegerProperty()
     pop_work = ndb.IntegerProperty()
 
+    num_postcodes = ndb.IntegerProperty()
+
     @classmethod
     def get(cls):
         return cls.query()

@@ -130,6 +130,12 @@ def update_dz():
         n_codes += 1
         p.put()
     logging.info("Inferred %i datazones for postcodes" % (n_codes))
+    for dz in datazones:
+        postcodes = model.Postcodes.query(model.Postcodes.datazone_id
+                                          == dz.code).fetch()
+        dz.num_postcodes = len(postcodes)
+        dz.put()
+    logging.info("Updated postcode counts")
 
 def update_pop():
     logging.info("Updating population data")
