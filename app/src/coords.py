@@ -85,6 +85,60 @@ class GridRef():
         self.x = x
         self.y = y
 
+    @classmethod
+    def fromGeoRef(self, ref):
+        lat = ref.longitude * pi / 180
+        lon = ref.latitude * pi / 180
+
+        a = 6377563.396
+        b = 6356256.910
+        F0 = 0.9996012717
+        lat0 = 49 * pi / 180
+        lon0 = -2 * pi / 180
+        N0 = -100000
+        E0 = 400000
+        e2 = 1 - (b*b)/(a*a)
+        n = (a-b)/(a+b)
+        n2 = n*n
+        n3 = n*n*n
+
+        cosLat = cos(lat)
+        sinLat = sin(lat)
+        nu = a*F0/sqrt(1-e2*sinLat*sinLat)
+        rho = a*F0*(1-e2)/pow(1-e2*sinLat*sinLat, 1.5)
+        eta2 = nu/rho-1
+
+        Ma = (1 + n + (5/4)*n2 + (5/4)*n3) * (lat-lat0)
+        Mb = (3*n + 3*n*n + (21/8)*n3) * sin(lat-lat0) * cos(lat+lat0)
+        Mc = ((15/8)*n2 + (15/8)*n3) * sin(2*(lat-lat0)) * cos(2*(lat+lat0))
+        Md = (35/24)*n3 * sin(3*(lat-lat0)) * cos(3*(lat+lat0))
+        M = b * F0 * (Ma - Mb + Mc - Md)
+
+        cos3lat = cosLat*cosLat*cosLat
+        cos5lat = cos3lat*cosLat*cosLat
+        tan2lat = tan(lat)*tan(lat)
+        tan4lat = tan2lat*tan2lat
+
+        I = M + N0
+        II = (nu/2)*sinLat*cosLat
+        III = (nu/24)*sinLat*cos3lat*(5-tan2lat+9*eta2)
+        IIIA = (nu/720)*sinLat*cos5lat*(61-58*tan2lat+tan4lat)
+        IV = nu*cosLat
+        V = (nu/6)*cos3lat*(nu/rho-tan2lat)
+        VI = (nu/120) * cos5lat * (5 - 18*tan2lat + tan4lat + 14*eta2 - 58*tan2lat*eta2)
+
+        dLon = lon-lon0
+        dLon2 = dLon*dLon
+        dLon3 = dLon2*dLon
+        dLon4 = dLon3*dLon
+        dLon5 = dLon4*dLon
+        dLon6 = dLon5*dLon
+
+        N = I + II*dLon2 + III*dLon4 + IIIA*dLon6
+        E = E0 + IV*dLon + V*dLon3 + VI*dLon5
+
+        return self(int(E), int(N))
+
     def distance(self, a):
         dx = a.x - self.x
         dy = a.y - self.y
