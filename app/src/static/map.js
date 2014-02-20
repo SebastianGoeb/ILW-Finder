@@ -1,56 +1,100 @@
 var postcode_locations;
 var postcode_neighbourhoods;
 var neighbourhoods = {};
-var current_colour = 0x0;
 
+/* A postcode is a house. Every postcode will have an associated district
+   (the "natural neighbourhood"). */
+var nodes = {};
+var districts = {};
 
+var map;
+
+function Node() {
+    this.postcode = undefined;
+    this.georef = undefined;
+    this.district = undefined;
+
+    function getTwoClosestInDistrict() {
+        out = [undefined, undefined];
+        outRng = [undefined, undefined];
+    };
+}
+
+current_colour = 0x101010;
+
+function District() {
+    this.nodes = [];
+    this.name = undefined;
+
+    function _nextColour() {
+        current_colour = current_colour + 0xB0;
+        return "#" + current_colour.toString(16);
+    };
+
+    this.colour = _nextColour();
+}
 
 $.get( "get/district/of-postcodes", function (data) {
-					postcode_neighbourhoods = $.parseJSON(data);
-					parse_neighbourhoods();
-					$.get( "get/georef/of-postcodes", function (data) {
-					  					postcode_locations = $.parseJSON(data);
-					  					initmap();
-					});
+    districts_in = $.parseJSON(data);
+    n_districts = 0
+    
+    for (var pc in districts_in) {
+        district_name = districts_in[pc];
+
+        var d;
+
+        if (!(district_name in districts)) {
+            d = new District();
+            d.name = district_name;
+            districts[district_name] = d;
+
+            n_districts++;
+        } else {
+            d = districts[district_name];
+        }
+
+        n = new Node();
+        n.district = d;
+        n.postcode = pc;
+        d.nodes.push(n);
+
+        nodes[pc] = n;
+    }
+    
+    console.log("Found "+n_districts+" districts");
+
+    $.get("get/georef/of-postcodes", function (data) {
+        coords = $.parseJSON(data);
+        n_nodes = 0
+        for (var pc in coords) {
+            nodes[pc].georef =
+                new google.maps.LatLng(coords[pc][1], coords[pc][0]);
+            n_nodes++
+        }
+        
+        console.log("Found "+n_nodes+" postcodes");
+
+        initmap();
+    });
 });
 
-function parse_neighbourhoods () {
-	for (var key in postcode_neighbourhoods) {
-		var neighbourhood = postcode_neighbourhoods[key];
-		if ($.inArray(neighbourhood, neighbourhoods) == -1) {
-			neighbourhoods[neighbourhood] = get_colour();
-		};
-	};
-};
-
-function get_colour () {
-	current_colour = current_colour + 0x70;
-	return "#" + current_colour;
-};
-
-//initmap();
-
 function initmap() {
-	// set up the map
-	map = new L.Map('map');
-
-	// create the tile layer with correct attribution
-	var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-	var osmAttrib='Map data © OpenStreetMap contributors';
-	var osm = new L.TileLayer(osmUrl, {attribution: osmAttrib});
-
-	map.setView([55.94, -3.2], 13);
-	map.addLayer(osm);
-
-	for (var key in postcode_locations) {
-
-		var neighbourhood = postcode_neighbourhoods[key];
-		var circle = L.circle(postcode_locations[key].reverse(), 5, {
-			opacity: 1,
-			color: neighbourhoods[neighbourhood],
-			fillOpacity: 1
-		}).addTo(map);
-		circle.bindPopup(neighbourhood);
-	};
-};
-
+    var mapOptions = {
+        center: new google.maps.LatLng(55.94, -3.2),
+        zoom: 12
+    };
+    
+    map = new google.maps.Map(document.getElementById("map-canvas"),
+		                          mapOptions);
+    for (var pc in nodes) {
+        nodes[pc].circ =
+            new google.maps.Circle({
+                strokeOpacity: 0.0,
+                fillColor: nodes[pc].district.colour,
+                fillOpacity: 0.5,
+                map: map,
+                center: nodes[pc].georef,
+                radius: 40
+            });
+    }
+}
