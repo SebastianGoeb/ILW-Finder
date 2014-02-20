@@ -47,7 +47,6 @@ class Postcodes (ndb.Model):
     @classmethod
     def getIdByCode(cls, code):
         return cls.by_postcode(code).fetch(1)[0].id
-
     @classmethod
     def getFull(cls):
         results = []
@@ -55,7 +54,6 @@ class Postcodes (ndb.Model):
             f_post = format_postcode(postcode)
             results.append(f_post)
         return results
-<<<<<<< HEAD
 
 class Datazone (ndb.Model):
     id = ndb.IntegerProperty(indexed = True)
@@ -75,7 +73,6 @@ class Datazone (ndb.Model):
     @classmethod
     def by_code(cls, name):
         return cls.query(cls.code == name)
-
     @classmethod
     def getDataZones(cls):
         ret = []
@@ -88,8 +85,7 @@ class Datazone (ndb.Model):
             results["grid_y"] = grid_y;
             ret.append(results)
         return ret
->>>>>>> slight model changes
-            
+
 '''class District (ndb.Model):
     name = ndb.StringProperty()
     x_coord = ndb.IntegerProperty()
