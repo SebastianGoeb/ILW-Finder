@@ -1,7 +1,6 @@
 var postcode_locations;
 var postcode_neighbourhoods;
 var neighbourhoods = {};
-var current_colour = 0x0;
 
 /* A postcode is a house. Every postcode will have an associated district
    (the "natural neighbourhood"). */
@@ -10,6 +9,31 @@ var districts = {};
 
 var map;
 
+function Node() {
+    this.postcode = undefined;
+    this.georef = undefined;
+    this.district = undefined;
+
+    function getTwoClosestInDistrict() {
+        out = [undefined, undefined];
+        outRng = [undefined, undefined];
+    };
+}
+
+current_colour = 0x101010;
+
+function District() {
+    this.nodes = [];
+    this.name = undefined;
+
+    function _nextColour() {
+        current_colour = current_colour + 0xB0;
+        return "#" + current_colour.toString(16);
+    };
+
+    this.colour = _nextColour();
+}
+
 $.get( "get/district/of-postcodes", function (data) {
     districts_in = $.parseJSON(data);
     n_districts = 0
@@ -17,15 +41,24 @@ $.get( "get/district/of-postcodes", function (data) {
     for (var pc in districts_in) {
         district_name = districts_in[pc];
 
+        var d;
+
         if (!(district_name in districts)) {
-            districts[district_name] = {
-                colour: next_district_colour()
-            };
+            d = new District();
+            d.name = district_name;
+            districts[district_name] = d;
 
             n_districts++;
+        } else {
+            d = districts[district_name];
         }
-                  
-        nodes[pc] = {district:district_name};
+
+        n = new Node();
+        n.district = d;
+        n.postcode = pc;
+        d.nodes.push(n);
+
+        nodes[pc] = n;
     }
     
     console.log("Found "+n_districts+" districts");
@@ -36,10 +69,6 @@ $.get( "get/district/of-postcodes", function (data) {
         for (var pc in coords) {
             nodes[pc].georef =
                 new google.maps.LatLng(coords[pc][1], coords[pc][0]);
-            nodes[pc].marker =
-                new google.maps.Marker({
-                    position: nodes[pc].georef
-                });
             n_nodes++
         }
         
@@ -48,12 +77,6 @@ $.get( "get/district/of-postcodes", function (data) {
         initmap();
     });
 });
-
-
-function next_district_colour () {
-    current_colour = current_colour + 0x90;
-    return "#" + current_colour;
-};
 
 function initmap() {
     var mapOptions = {
@@ -64,6 +87,14 @@ function initmap() {
     map = new google.maps.Map(document.getElementById("map-canvas"),
 		                          mapOptions);
     for (var pc in nodes) {
-        nodes[pc].marker.setMap(map);
+        nodes[pc].circ =
+            new google.maps.Circle({
+                strokeOpacity: 0.0,
+                fillColor: nodes[pc].district.colour,
+                fillOpacity: 0.5,
+                map: map,
+                center: nodes[pc].georef,
+                radius: 40
+            });
     }
 }
