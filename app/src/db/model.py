@@ -1,6 +1,41 @@
 from google.appengine.ext import ndb
+import re
 
 # ndb database classes
+
+class District (ndb.Model):
+    name = ndb.StringProperty()
+
+class Datazone (ndb.Model):
+    id = ndb.IntegerProperty(indexed = True)
+    code = ndb.IntegerProperty()
+    grid_x = ndb.IntegerProperty()
+    grid_y = ndb.IntegerProperty()
+
+    pop_total = ndb.IntegerProperty()
+    pop_child = ndb.IntegerProperty()
+    pop_pens = ndb.IntegerProperty()
+    pop_work = ndb.IntegerProperty()
+
+    @classmethod
+    def get(cls):
+        return cls.query()
+
+    @classmethod
+    def by_code(cls, name):
+        return cls.query(cls.code == name)
+    @classmethod
+    def getDataZones(cls):
+        ret = []
+        for dataZone in cls.query().fetch():
+            results = {}
+            postcodes = Postcodes.get_by_zone_id(dataZone.id)
+            results["postcodes"] = postcodes;
+            results["name"] = name;
+            results["grid_x"] = grid_x;
+            results["grid_y"] = grid_y;
+            ret.append(results)
+        return ret
 
 # let's not consider this as a postcode, but rather a person/entity
 class Postcodes (ndb.Model):
@@ -8,7 +43,10 @@ class Postcodes (ndb.Model):
     grid_x = ndb.IntegerProperty()
     grid_y = ndb.IntegerProperty()
     datazone_id = ndb.IntegerProperty()
-    
+
+    districts = ndb.KeyProperty(District, repeated=True)
+    datazone = ndb.KeyProperty(Datazone)
+
     @classmethod
     def get(cls):
         return cls.query()
@@ -54,37 +92,6 @@ class Postcodes (ndb.Model):
             f_post = format_postcode(postcode)
             results.append(f_post)
         return results
-
-class Datazone (ndb.Model):
-    id = ndb.IntegerProperty(indexed = True)
-    code = ndb.IntegerProperty()
-    grid_x = ndb.IntegerProperty()
-    grid_y = ndb.IntegerProperty()
-
-    pop_total = ndb.IntegerProperty()
-    pop_child = ndb.IntegerProperty()
-    pop_pens = ndb.IntegerProperty()
-    pop_work = ndb.IntegerProperty()
-
-    @classmethod
-    def get(cls):
-        return cls.query()
-
-    @classmethod
-    def by_code(cls, name):
-        return cls.query(cls.code == name)
-    @classmethod
-    def getDataZones(cls):
-        ret = []
-        for dataZone in cls.query().fetch():
-            results = {}
-            postcodes = Postcodes.get_by_zone_id(dataZone.id)
-            results["postcodes"] = postcodes;
-            results["name"] = name;
-            results["grid_x"] = grid_x;
-            results["grid_y"] = grid_y;
-            ret.append(results)
-        return ret
 
 '''class District (ndb.Model):
     name = ndb.StringProperty()
