@@ -73,7 +73,7 @@ def dz_parseCsvCode(s):
     return int(s[1:])
 
 def pc_fromStr(s):
-    return s.replace(' ', '').upper()
+    return s.trim().upper()
 
 def reformat_postcode(s):
     return s[:-3]  + ' ' + s[-3:]
