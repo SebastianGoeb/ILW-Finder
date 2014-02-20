@@ -51,14 +51,28 @@ class Postcodes (ndb.Model):
             f_post = format_postcode(postcode)
             results.append(f_post)
         return results
+
 class Datazone (ndb.Model):
     id = ndb.IntegerProperty(indexed = True)
-    name = ndb.StringProperty()
+    code = ndb.IntegerProperty()
     grid_x = ndb.IntegerProperty()
     grid_y = ndb.IntegerProperty()
 
+    pop_total = ndb.IntegerProperty()
+    pop_child = ndb.IntegerProperty()
+    pop_pens = ndb.IntegerProperty()
+    pop_work = ndb.IntegerProperty()
+
     @classmethod
-    def getDataZones(cls):
+    def get(cls):
+        return cls.query()
+
+    @classmethod
+    def by_code(cls, name):
+        return cls.query(cls.code == name)
+        
+    @classmethod
+    def getDatazones(cls):
         ret = []
         for dataZone in cls.query().fetch():
             results = {}

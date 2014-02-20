@@ -5,12 +5,12 @@ from coords import *
 import simplejson as json
 
 def req_testGetAllPostcodes(args):
-	
+    
 
 class Main(webapp.RequestHandler):
-	def post(self):
-		
-		self.response.out.write('Done')
+    def post(self):
+        
+        self.response.out.write('Done')
 
 app = webapp2.WSGIApplication([('/request', Main)],
-															debug=True)
+                                                            debug=True)

@@ -36,6 +36,10 @@ def get_grOfPcs():
     data = {x.postcode: f_(x) for x in data}
     return retJson(data)
 
+@Main.route('/get/datazones')
+def get_datazones():
+    return retJson(model.Datazone.getDatazones())
+
 @Main.route('/get/test_data')
 def test_data():
     postcode = model.Postcodes()
