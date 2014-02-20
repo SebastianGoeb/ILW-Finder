@@ -28,6 +28,10 @@ class Postcodes (ndb.Model):
         return cls.query(cls.postcode == pc)
 
     @classmethod
+    def getIdByCode(cls, code):
+        return cls.by_postcode(code).fetch(1)[0].id
+
+    @classmethod
     def getFull(cls):
         results = []
         for postcode in cls.query().fetch():

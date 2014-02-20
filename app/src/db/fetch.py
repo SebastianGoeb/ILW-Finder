@@ -40,7 +40,7 @@ def get_grOfPcs():
     
 @Main.route('/get/publicPlaces')
 def get_public_places():
-    return str(publicPlaces.extractPublicPlaces())
+    return str(publicPlaces.storePublicPlaces())
 @Main.route('/get/test_data')
 def test_data():
     postcode = model.Postcodes()
