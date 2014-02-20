@@ -1,12 +1,13 @@
 from flask import Flask
 from StringIO import StringIO
 import simplejson as json
+import publicPlaces
 
 import logging
 
 from db import model
 
-from coords import *
+from ..coords import *
 
 Main = Flask(__name__)
 logging.getLogger().setLevel(logging.DEBUG)
@@ -36,6 +37,10 @@ def get_grOfPcs():
     data = {x.postcode: f_(x) for x in data}
     return retJson(data)
 
+    
+@Main.route('/get/publicPlaces')
+def get_public_places():
+    return str(publicPlaces.extractPublicPlaces())
 @Main.route('/get/test_data')
 def test_data():
     postcode = model.Postcodes()
