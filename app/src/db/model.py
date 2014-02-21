@@ -8,7 +8,6 @@ class District (ndb.Model):
 
 class Datazone (ndb.Model):
     id = ndb.IntegerProperty(indexed = True)
-    code = ndb.IntegerProperty()
     grid_x = ndb.IntegerProperty()
     grid_y = ndb.IntegerProperty()
 
@@ -42,8 +41,7 @@ class Postcodes (ndb.Model):
     postcode = ndb.StringProperty()
     grid_x = ndb.IntegerProperty()
     grid_y = ndb.IntegerProperty()
-    datazone_id = ndb.IntegerProperty()
-
+    
     districts = ndb.KeyProperty(District, repeated=True)
     datazone = ndb.KeyProperty(Datazone)
 

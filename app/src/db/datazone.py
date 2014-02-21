@@ -3,13 +3,15 @@ import logging
 from pprint import pprint
 import csv
 
+import json
+
 from cStringIO import StringIO
 
 from google.appengine.api import urlfetch
 from google.appengine.ext import deferred
 from urllib import urlencode
 
-from db import model
+from db.model import *
 from coords import *
 
 logging.getLogger().setLevel(logging.DEBUG)
@@ -62,8 +64,11 @@ def ods_query(fmt):
 
 class UpdateDB(webapp2.RequestHandler):
     def get(self):
-        deferred.defer(update_dz)
-        deferred.defer(update_pop)
+#        deferred.defer(update_dz)
+#        deferred.defer(update_pop)
+#        update_dz()
+        update_empty_pc()
+        update_pop()
         self.response.out.write('finished datazone.UpdateDB')
 
 def dz_parseCode(s):
@@ -73,7 +78,7 @@ def dz_parseCsvCode(s):
     return int(s[1:])
 
 def pc_fromStr(s):
-    return s.trim().upper()
+    return s.strip().upper()
 
 def reformat_postcode(s):
     return s[:-3]  + ' ' + s[-3:]
@@ -84,49 +89,64 @@ def update_dz():
     csv_in = csv.DictReader(f_in)
     n_zones = 0
     n_codes = 0
-    for row in csv_in:
-        dz_code = dz_parseCode(row['dzLabel'])
-        dz_db = model.Datazone.by_code(dz_code).fetch()
 
-        if len(dz_db) > 0:
+    dbPostcodes_in = None
+    with open('data/ods-datazone-postcodes.json', 'r') as f:
+        dbPostcodes_in = json.loads(f.read())
+
+    odsPostcodes = {}
+
+    for x in dbPostcodes_in['results']['bindings']:
+        pcNorm = pc_fromStr(x['pcLabel']['value'])
+        dzNorm = dz_parseCode(x['dzLabel']['value'])
+        if dzNorm in odsPostcodes:
+            odsPostcodes[dzNorm].append(pcNorm)
+        else:
+            odsPostcodes[dzNorm] = [pcNorm]
+    
+    for row in csv_in:
+        dzCode = dz_parseCode(row['dzLabel'])
+        dbDatazone = Datazone.get_by_id(dzCode)
+
+        if dbDatazone is None:
+            dbDatazone = Datazone(
+                id = dzCode,
+                grid_x = int(row['dzGridX']),
+                grid_y = int(row['dzGridY'])
+            )
+            dbDatazone = dbDatazone.put()
+        else:
             continue
-        
-        dz_postcodes_in = StringIO(ods_query(sparql_edinDzPcs % (row['dz'])))
-        dz_postcodes_csv = csv.DictReader(dz_postcodes_in)
-        for pc_row in dz_postcodes_csv:
-            pc_norm = pc_fromStr(pc_row['pcLabel'])
-            pc_match = model.Postcodes.query(
-                model.Postcodes.postcode == pc_norm).fetch()
-            for m in pc_match:
-                m.datazone_id = dz_code
-                n_codes += 1
-                m.put()
-        dz_postcodes_in.close()
-        dz_lst = []
-        if len(dz_db) == 0:
-            # no such datazone in db
-            dz_lst.append(model.Datazone(code=dz_code))
-        for dz in dz_lst:
-            dz.grid_x = int(row['dzGridX'])
-            dz.grid_y = int(row['dzGridY'])
-            dz.put()
-            n_zones += 1
+
+        n_zones += 1
+
+        if dzCode in odsPostcodes:
+            for odsPostcode in odsPostcodes[dzCode]:
+                dbPostcode = Postcodes.query(
+                    Postcodes.postcode == odsPostcode).get()
+                if dbPostcode is not None:
+                    dbPostcode.datazone = dbDatazone
+                    dbPostcode.put()
+                    n_codes += 1
     f_in.close()
     logging.info("Added %i datazones to DB" % (n_zones))
     logging.info("Updated %i postcode entries" %(n_codes))
-    datazones = model.Datazone.query().fetch()
-    postcodes = model.Postcodes.query(model.Postcodes.datazone_id == 0).fetch()
+
+def update_empty_pc():
+    logging.info("Updating Postcodes with no Datazone")
+    datazones = Datazone.query().fetch()
+    postcodes = Postcodes.query(Postcodes.datazone == None).fetch()
     n_codes = 0
     for p in postcodes:
         gr = GridRef(p.grid_x, p.grid_y)
-        best_id = 0
-        best_rng = 0
+        best_id = None
+        best_rng = None
         for d in datazones:
             rng = gr.distance(GridRef(d.grid_x, d.grid_y))
-            if best_id == 0 or rng < best_rng:
-                best_id = d.code
+            if (best_id is None) or (rng < best_rng):
+                best_id = d
                 best_rng = rng
-        p.datazone_id = best_id
+        p.datazone = best_id.key
         n_codes += 1
         p.put()
     logging.info("Inferred %i datazones for postcodes" % (n_codes))
@@ -137,9 +157,8 @@ def update_pop():
     with open('data/datazone-population.csv', 'r') as f_in:
         csv_in = csv.DictReader(f_in)
         for row in csv_in:
-            zone = model.Datazone.query(
-                model.Datazone.code
-                == dz_parseCsvCode(row['GeographyCode'])
+            zone = Datazone.query(
+                Datazone.id == dz_parseCsvCode(row['GeographyCode'])
             ).fetch()
             for z in zone:
                 z.pop_total = int(row['GR-denominatorindP'])
