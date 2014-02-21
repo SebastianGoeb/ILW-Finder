@@ -1,6 +1,7 @@
 var districts = {};//district name -> District()
 var map;
 var infoWindow;
+var voronoi_visible = false;
 
 function District() {
     this.name;
@@ -117,10 +118,11 @@ function initmap() {
     	d.polygon = new google.maps.Polygon({
     		paths: [],
     		strokeColor: "#000000",
-    		strokeOpacity: 0.1,
+    		strokeOpacity: 0.5,
     		strokeWeight: 1,
     		fillColor: d.colour,
-    		fillOpacity: 0.1,
+    		fillOpacity: 0.05,
+            visible: voronoi_visible,
     		district: district_name
     	});
     	d.polygon.setMap(map);
@@ -220,4 +222,16 @@ function showDistrict(event) {
 	infoWindow.setContent(d.name + "<br/>lat: " + d.mean_coord[1] + "<br/>lng: " + d.mean_coord[0]);
 	infoWindow.setPosition(new google.maps.LatLng(d.mean_coord[1], d.mean_coord[0]));
 	infoWindow.open(map);
+}
+
+function toggleVoronoi(){
+    voronoi_visible = !voronoi_visible;
+    for (var district_name in districts) {
+        var d = districts[district_name];
+        d.polygon.setVisible(voronoi_visible);
+    }
+}
+
+function toggleDatazones(){
+    alert("Datazones not yet implemented!");
 }

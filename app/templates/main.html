@@ -4,9 +4,37 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <style type="text/css">
-      html { height: 100% }
-      body { height: 100%; margin: 0; padding: 0 }
-      #map-canvas { height: 100% }
+    html, body, #map-canvas {
+      height: 100%;
+      width: 100%;
+      margin: 0px;
+      border: 0px;
+    }
+    #button-panel {
+      position: absolute;
+      top: 0px;
+      right: 100px;
+      margin-left: -180px;
+      z-index: 5;
+      background-color: rgba(0,0,0,0);
+      padding: 5px;
+    }
+    .toggleButton
+    {
+      padding: 10px 10px 10px 10px !important;
+      font-size: 18px !important;
+      background-color: #909090;
+      font-weight: bold;
+      text-shadow: 1px 0px rgba(255,255,255,0.5);
+      color: #333333;
+      border-radius: 10px;
+      -moz-border-radius: 10px;
+      -webkit-border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.0) inset;
+      -moz-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.0) inset;
+      -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.0) inset;
+    }
     </style>
     <script type="text/javascript"
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDzM6vnoSDzw6Z5sGtMDtwZ5TD4SU5ljGc&sensor=false&libraries=visualization">
@@ -14,6 +42,10 @@
     <script type="text/javascript" src="static/map.js"></script>
   </head>
   <body>
+    <div id="button-panel">
+      <button onclick="toggleVoronoi()" class="toggleButton">Toggle Voronoi</button>
+      <button onclick="toggleDatazones()" class="toggleButton">Toggle Datazones</button>
+    </div>
     <div id="map-canvas"/>
   </body>
 </html>
