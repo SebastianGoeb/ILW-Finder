@@ -3,8 +3,16 @@ import re
 
 # ndb database classes
 
+class Meta (ndb.Model):
+    total_pop = ndb.IntegerProperty()
+    total_child = ndb.IntegerProperty()
+    total_pens = ndb.IntegerProperty()
+    total_work = ndb.IntegerProperty()
+    
 class District (ndb.Model):
     name = ndb.StringProperty()
+    pop_weight = ndb.FloatProperty()
+    pop_total = ndb.IntegerProperty()
 
 class Datazone (ndb.Model):
     id = ndb.IntegerProperty(indexed = True)

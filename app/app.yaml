@@ -15,6 +15,9 @@ handlers:
 - url: /updatedb/.*
   script: src.backend.main
 
+- url: /calc/.*
+  script: src.backend.main
+
 - url: /get/.*
   script: src.db.fetch.Main
 
