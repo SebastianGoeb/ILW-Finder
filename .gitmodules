@@ -4,3 +4,6 @@
 [submodule "natural-neighbourhoods"]
 	path = natural-neighbourhoods
 	url = https://github.com/edinburghcouncil/natural-neighbourhoods
+[submodule "heatmap"]
+	path = heatmap
+	url = git@github.com:pa7/heatmap.js.git

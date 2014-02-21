@@ -1,15 +1,64 @@
 from google.appengine.ext import ndb
+import re
 
 # ndb database classes
 
+class Meta (ndb.Model):
+    total_pop = ndb.IntegerProperty()
+    total_child = ndb.IntegerProperty()
+    total_pens = ndb.IntegerProperty()
+    total_work = ndb.IntegerProperty()
+    
+class District (ndb.Model):
+    name = ndb.StringProperty()
+    pop_weight = ndb.FloatProperty()
+    pop_total = ndb.IntegerProperty()
+    colour_hue = ndb.FloatProperty()
 
+class Datazone (ndb.Model):
+    id = ndb.IntegerProperty(indexed = True)
+    grid_x = ndb.IntegerProperty()
+    grid_y = ndb.IntegerProperty()
+
+    pop_total = ndb.IntegerProperty()
+    pop_child = ndb.IntegerProperty()
+    pop_pens = ndb.IntegerProperty()
+    pop_work = ndb.IntegerProperty()
+
+    num_postcodes = ndb.IntegerProperty()
+
+    colour_hue = ndb.FloatProperty()
+
+    @classmethod
+    def get(cls):
+        return cls.query()
+
+    @classmethod
+    def by_code(cls, name):
+        return cls.query(cls.code == name)
+    @classmethod
+    def getDataZones(cls):
+        ret = []
+        for dataZone in cls.query().fetch():
+            results = {}
+            postcodes = Postcodes.get_by_zone_id(dataZone.id)
+            results["postcodes"] = postcodes;
+            results["name"] = name;
+            results["grid_x"] = grid_x;
+            results["grid_y"] = grid_y;
+            ret.append(results)
+        return ret
+
+# let's not consider this as a postcode, but rather a person/entity
 class Postcodes (ndb.Model):
     postcode = ndb.StringProperty()
     grid_x = ndb.IntegerProperty()
     grid_y = ndb.IntegerProperty()
-    datazone_id = ndb.IntegerProperty()
-    district = ndb.StringProperty()
     
+    districts = ndb.KeyProperty(District, repeated=True)
+    datazone = ndb.KeyProperty(Datazone)
+    population = ndb.FloatProperty()
+
     @classmethod
     def get(cls):
         return cls.query()
@@ -49,42 +98,7 @@ class Postcodes (ndb.Model):
             results.append(ret)
         return results
 
-class Datazone (ndb.Model):
-    id = ndb.IntegerProperty(indexed = True)
-    code = ndb.IntegerProperty()
-    grid_x = ndb.IntegerProperty()
-    grid_y = ndb.IntegerProperty()
 
-    pop_total = ndb.IntegerProperty()
-    pop_child = ndb.IntegerProperty()
-    pop_pens = ndb.IntegerProperty()
-    pop_work = ndb.IntegerProperty()
-
-    @classmethod
-    def get(cls):
-        return cls.query()
-
-    @classmethod
-    def by_code(cls, name):
-        return cls.query(cls.code == name)
-<<<<<<< HEAD
-
-    @classmethod
-    def getDataZones(cls):
-        ret = []
-        for dataZone in cls.query().fetch():
-            results = {}
-            postcodes = Postcodes.get_by_zone_id(dataZone.id)
-            results["postcodes"] = postcodes;
-            results["name"] = name;
-            results["grid_x"] = grid_x;
-            results["grid_y"] = grid_y;
-            ret.append(results)
-        return ret
-
-=======
-            
->>>>>>> parent of 5aefe10... model merged
 '''class District (ndb.Model):
     name = ndb.StringProperty()
     x_coord = ndb.IntegerProperty()
@@ -119,7 +133,6 @@ class PlaceCat(ndb.Model):
 '''class PublicPlace(ndb.Model):
     cat_id = ndb.IntegerProperty()
     postcode_id = ndb.IntegerProperty()
-    
     @classmethod
     def get(cls):
         return cls.query()'''
