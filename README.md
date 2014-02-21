@@ -25,3 +25,11 @@ An interactive map to determine communities/natural neighbourhoods in Edinburgh 
 ###### Deploy to Google App Engine [http://ilw-finder.appspot.com/](http://ilw-finder.appspot.com/)
 > make push
 
+
+## Project by
+
+Sebastian Goeb
+Babak Esmaeili
+Martynas Melninkas
+Roberth Kulbin
+Martin Husbyn
