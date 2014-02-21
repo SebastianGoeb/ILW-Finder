@@ -1,0 +1,23 @@
+SELECT ?schLabel ?schNorthing ?schEasting
+WHERE {
+      ?sch a <http://data.opendatascotland.org/def/education/EducationEstablishment>;
+      	   <http://www.w3.org/2000/01/rdf-schema#label> ?schLabel;
+	   <http://data.ordnancesurvey.co.uk/ontology/postcode/postcode> ?schPC.
+      ?schPC <http://data.ordnancesurvey.co.uk/ontology/spatialrelations/northing> ?schNorthing;
+      	     <http://data.ordnancesurvey.co.uk/ontology/spatialrelations/easting> ?schEasting;
+	     <http://data.opendatascotland.org/def/geography/dataZone> ?schDZ.
+      ?schDZ <http://data.ordnancesurvey.co.uk/ontology/admingeo/inDistrict> <http://statistics.data.gov.uk/id/statistical-geography/S12000036>.
+}
+
+
+PREFIX geoDataZone: <http://data.opendatascotland.org/def/geography/dataZone>
+PREFIX label: <http://www.w3.org/2000/01/rdf-schema#label>
+PREFIX pc: <http://data.ordnancesurvey.co.uk/ontology/postcode/PostcodeUnit>
+SELECT ?pcLabel ?dzLabel
+WHERE {
+ ?pc a pc:;
+     label: ?pcLabel;
+     <http://data.opendatascotland.org/def/geography/dataZone> ?dz.
+ ?dz label: ?dzLabel;
+     <http://data.ordnancesurvey.co.uk/ontology/admingeo/inDistrict> <http://statistics.data.gov.uk/id/statistical-geography/S12000036>.
+}

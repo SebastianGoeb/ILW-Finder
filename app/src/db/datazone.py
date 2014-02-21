@@ -66,9 +66,9 @@ class UpdateDB(webapp2.RequestHandler):
     def get(self):
 #        deferred.defer(update_dz)
 #        deferred.defer(update_pop)
-        update_dz()
-        update_empty_pc()
-        update_pop()
+        deferred.defer(update_dz)
+        deferred.defer(update_empty_pc)
+        deferred.defer(update_pop)
         self.response.out.write('finished datazone.UpdateDB')
 
 def dz_parseCode(s):
@@ -177,4 +177,9 @@ def update_pop():
             pc.population = float(dz.pop_total) / float(dz.num_postcodes)
             pc.put()
         dz.put()
+    postcodes = Postcodes.query(
+        Postcodes.population == None).fetch()
+    for pc in postcodes:
+        pc.population = 30
+        pc.put()
     logging.info("Updated postcode counts")

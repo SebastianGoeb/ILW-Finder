@@ -3,11 +3,11 @@ import logging
 from db.model import *
 import colorsys
 from math import *
-
+from google.appengine.ext import deferred
 class Calc(webapp2.RequestHandler):
     def get(self):
-        update_district_weights()
-        update_dz_hues()
+        deferred.defer(update_district_weights)
+        deferred.defer(update_dz_hues)
         self.response.out.write('done')
 
 def update_district_weights():
@@ -37,9 +37,12 @@ def update_district_weights():
         dbPostcodes = Postcodes.query(
             Postcodes.districts == d.key).fetch()
         for pc in dbPostcodes:
-            pcDatazone = pc.datazone.get()
-            if pc.population is not None:
-                d_pop_total += pc.population
+            if pc.datazone is None:
+                d_pop_total += 30
+            else:
+                pcDatazone = pc.datazone.get()
+                if pc.population is not None:
+                    d_pop_total += pc.population
         d.pop_total = int(d_pop_total)
         d.pop_weight = float(d_pop_total) / float(sum_total)
         d.colour_hue = colK_cur
@@ -68,6 +71,8 @@ def update_dz_hues():
                 did = district.id()
                 district = district.get()
                 myDistrictPop += pcPop
+                if district.colour_hue is None:
+                    district.colour_hue = 0.0001
                 if did not in myDistricts:
                     myDistricts[did] = {
                         'postcodes':[pc],
