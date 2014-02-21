@@ -61,7 +61,10 @@ def get_popOfPc():
 @Main.route('/get/district/of-postcodes')
 def get_distOfPc():
     data = model.Postcodes.get().fetch()
-    data = {x.postcode: x.district for x in data}
+    def f_(x):
+        districts = x.districts
+        return districts[0].get().name
+    data = {x.postcode: f_(x) for x in data}
     return retJson(data)
         
 @Main.route('/get/georef/of-postcodes')
