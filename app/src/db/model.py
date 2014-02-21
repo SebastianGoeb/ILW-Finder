@@ -13,6 +13,7 @@ class District (ndb.Model):
     name = ndb.StringProperty()
     pop_weight = ndb.FloatProperty()
     pop_total = ndb.IntegerProperty()
+    colour_hue = ndb.FloatProperty()
 
 class Datazone (ndb.Model):
     id = ndb.IntegerProperty(indexed = True)
@@ -25,6 +26,8 @@ class Datazone (ndb.Model):
     pop_work = ndb.IntegerProperty()
 
     num_postcodes = ndb.IntegerProperty()
+
+    colour_hue = ndb.FloatProperty()
 
     @classmethod
     def get(cls):
@@ -54,6 +57,7 @@ class Postcodes (ndb.Model):
     
     districts = ndb.KeyProperty(District, repeated=True)
     datazone = ndb.KeyProperty(Datazone)
+    population = ndb.FloatProperty()
 
     @classmethod
     def get(cls):
