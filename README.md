@@ -28,8 +28,8 @@ An interactive map to determine communities/natural neighbourhoods in Edinburgh 
 
 ## Project by
 
-Sebastian Goeb
-Babak Esmaeili
-Martynas Melninkas
-Roberth Kulbin
+Sebastian Goeb<br/>
+Babak Esmaeili<br/>
+Martynas Melninkas<br/>
+Roberth Kulbin<br/>
 Martin Husbyn
