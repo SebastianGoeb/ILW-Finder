@@ -25,7 +25,7 @@ def get_postcodes():
 @Main.route('/get/district/of-postcodes')
 def get_distOfPc():
     data = model.Postcodes.get().fetch()
-    data = {x.postcode: x.district for x in data}
+    data = {x.postcode: x.datazone_id for x in data}
     return retJson(data)
         
 @Main.route('/get/georef/of-postcodes')
@@ -36,10 +36,6 @@ def get_grOfPcs():
         return [r.latitude, r.longitude]
     data = {x.postcode: f_(x) for x in data}
     return retJson(data)
- 
-@Main.route('/get/publicPlaces')
-def get_public_places():
-    return str(publicPlaces.storePublicPlaces())
 
 @Main.route('/get/datazones')
 def get_datazones():

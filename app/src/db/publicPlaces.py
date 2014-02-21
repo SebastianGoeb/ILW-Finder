@@ -1,10 +1,10 @@
-#import webapp2
+import webapp2
 import logging
 import csv
 from math import *
 from coords import *
 
-#from google.appengine.ext import deferred
+from google.appengine.ext import deferred
 
 import model
 
@@ -16,7 +16,7 @@ def extractPublicPlaces():
     parksAndGardens_Coord = []
     museumsAndGalleries_Coord = []
     SportsFacilities_Coord = []
-    postCode_Coord = []
+    postCode_Coord = {}
     postCode_Dictionary = {}
     with open('data/all-schools.csv', 'r') as f_in:
             csv_in = csv.DictReader(f_in)
@@ -85,13 +85,15 @@ def extractPublicPlaces():
 
     with open('data/Survey Data.csv', 'r') as f_in:
             csv_in = csv.DictReader(f_in)
+            count = 0
             for row in csv_in:
                 if (row['Xcord'] != 'Xcord' and row['Xcord'] != '#N/A' and row['Xcord'] != ''):
                     x = float(row['Xcord'])
                 if (row['Ycord'] != 'Ycord' and row['Ycord'] != '#N/A' and row['Ycord'] != ''):
                     y = float(row['Ycord'])
-                code = row['Pcode']
-                postCode_Coord.append((x, y, code))	
+                code = row['Pcode'].upper()
+                postCode_Coord[code] = (x,y)
+            logging.info("there are " + str(len(postCode_Coord.keys())) + " postcodes")
 
     #print (postCode_Coord)
 
@@ -99,27 +101,27 @@ def extractPublicPlaces():
         return sqrt((x1 - x2)**2 + (y1 - y2)**2)
 
 
-    def weight_Calc((x, y, z), public_place):
+    def weight_Calc((x, y), public_place):
         weight = 0
         for i in public_place:
             weight += (1/(distance((x, y), i)**2))
         return weight
                     
-    for postCode in postCode_Coord:
+    for postCode in postCode_Coord.items():
         dic = {}
-        val = weight_Calc(postCode, schools_Coord)
+        val = weight_Calc(postCode[1], schools_Coord)
         dic["school"] = val
-        val = weight_Calc(postCode, playArea_Coord)
+        val = weight_Calc(postCode[1], playArea_Coord)
         dic["playArea"] = val
-        val = weight_Calc(postCode, parksAndGardens_Coord)
+        val = weight_Calc(postCode[1], parksAndGardens_Coord)
         dic["parksAndGardens"] = val
-        val = weight_Calc(postCode, museumsAndGalleries_Coord)
+        val = weight_Calc(postCode[1], museumsAndGalleries_Coord)
         dic["museumsAndGalleries"] = val
-        val = weight_Calc(postCode, SportsFacilities_Coord)
+        val = weight_Calc(postCode[1], SportsFacilities_Coord)
         dic["SportsFacilities"] = val
-        postCode_Dictionary[postCode[2]] = dic
-        dic["x"] = postCode[0]
-        dic["y"] = postCode[1]
+        dic["x"] = postCode[1][0]
+        dic["y"] = postCode[1][1]
+        postCode_Dictionary[postCode[0]] = dic
     return postCode_Dictionary
     
 def storePublicPlaces():
@@ -133,7 +135,7 @@ def storePublicPlaces():
         entry.key.delete()
     for entry in model.Postcodes().query().fetch():
         entry.key.delete()
-    
+    logging.info("databased cleared")
     #populating the database
     for cat in cat_list:
         db_entry = model.PlaceCat()
@@ -142,6 +144,7 @@ def storePublicPlaces():
         db_entry.put()
         i += 1
     j = 0
+    logging.info("writing relations and postcodes")
     for item in public_dict.items():
         post_entry = model.Postcodes()
         post_entry.grid_x = int(item[1]["x"])
@@ -149,7 +152,6 @@ def storePublicPlaces():
         post_entry.id = j
         post_entry.postcode = item[0]
         post_entry.datazone_id = 0;
-        post_entry.district = "Leith lol"
         post_entry.put()
         i = 1
         for cat in cat_list:
@@ -159,10 +161,14 @@ def storePublicPlaces():
             relation_entry.put()
             i+=1
         j +=1
+        if j == 1000:
+            logging.info("another 1k postcodes written")
+    logging.info("completed writing " + str(j) + " postcodes")
     return "done"
 
 
-
-
-
+class pc_cat_rel_updateDB(webapp2.RequestHandler):
+    def get(self):
+        deferred.defer(storePublicPlaces)
+        self.response.out.write('done')
 
