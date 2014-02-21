@@ -22,6 +22,13 @@ def get_postcodes():
     data = [x.to_dict()["postcode"] for x in model.Postcodes.get().fetch()]
     return retJson(data)
 
+@Main.route('/get/nn-hues/of-datazones')
+def get_huesOfDatazones():
+    dbQuery = model.Datazone.query().fetch()
+    return retJson({
+        x.id: x.colour_hue for x in dbQuery
+    })
+
 @Main.route('/get/total-pop')
 def get_popTotals():
     datazones = model.Datazone.get().fetch()
