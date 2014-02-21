@@ -11,38 +11,30 @@ function District() {
     this.polygon;
 }
 
-// function District() {
-//     this.name;
-//     this.colour = "#FF0000";
-//     this.pc_coords = [];
-//     this.mean_coord = [0.0,0.0];
-//     this.polygon;
-// }
-
-// $.get( "get/district/of-postcodes", function (data) {
-//     var districts_in = $.parseJSON(data);
-// 	var n_districts = 0
+$.get( "get/district/of-postcodes", function (data) {
+    var districts_in = $.parseJSON(data);
+	var n_districts = 0
     
-//     //construct district_name -> District() map
-//     for (var pc in districts_in) {
-//         var district_name = districts_in[pc];
+    //construct district_name -> District() map
+    for (var pc in districts_in) {
+        var district_name = districts_in[pc];
 
-//         if (!(district_name in districts)) {
-//         	var d = new District();
-//             d.name = district_name;
-//             districts[district_name] = d;
-//             n_districts++;
-//         }
-//     }
+        if (!(district_name in districts)) {
+        	var d = new District();
+            d.name = district_name;
+            districts[district_name] = d;
+            n_districts++;
+        }
+    }
 
-//     //assign colors to districts along HSL cylinder
-//     var district_k = 0;
-//     for (var district_name in districts) {
-//     	var d = districts[district_name];
-//     	var rgb = hslToRgb(district_k / n_districts, 1.0, 0.5);//TODO higher stride mod 1.0 ???
-//     	d.colour = "rgba(" + Math.floor(rgb[0]) + ", " + Math.floor(rgb[1]) + ", " + Math.floor(rgb[2]) + ", 1)";
-//         district_k++;
-//     }
+    //assign colors to districts along HSL cylinder
+    var district_k = 0;
+    for (var district_name in districts) {
+    	var d = districts[district_name];
+    	var rgb = hslToRgb(district_k / n_districts, 1.0, 0.5);//TODO higher stride mod 1.0 ???
+    	d.colour = "rgba(" + Math.floor(rgb[0]) + ", " + Math.floor(rgb[1]) + ", " + Math.floor(rgb[2]) + ", 1)";
+        district_k++;
+    }
     
     console.log("Found " + n_districts + " districts");
 
@@ -72,10 +64,11 @@ function District() {
         	d.mean_coord[1] /= d.pc_coords.length;
         }
 
-//         console.log("Found " + n_postcodes + " postcodes");
+        console.log("Found " + n_postcodes + " postcodes");
 
-//     });
-// });
+        initmap();
+    });
+});
 
 /* Converts an HSL color to an RGB color
  * h ∈ [0, 1], s ∈ [0, 1], v ∈ [0, 1]
@@ -138,76 +131,6 @@ function initmap() {
 	google.maps.event.addListener(map,'bounds_changed', updatePolygons);
 }
 
-// function getDatazones() {
-//     $.getJSON('static/edin_topo.json', function(data) {
-// 	var geoStyle = {
-// 	    strokeColor: '#505050',
-// 	    strokeOpacity: 0.4,
-// 	    fillColor: '#ff0000',
-// 	    fillOpacity: 0.1,
-// 	};
-
-// 	// var dz_topojson = new topojson.object(data,
-// 	// 				  data.objects.S12000036_geo);
-
-// 	var dz_topojson = topojson.mesh(data, data.objects.S12000036_geo)
-
-// 	var dz_geojson = new GeoJSON(dz_topojson, geoStyle);
-
-// 	addGeometries = function(overlays) {
-// 	    $.each(overlays, function(i, overlay) {
-// 		if (!overlay.length) {
-// 		    newOverlay = new google.maps.Polygon({
-// 			latLngs: overlay.latLngs,
-// 			strokeColor: '#505050',
-// 			strokeOpacity: 0.4,
-// 			fillColor: '#ff0000',
-// 			fillOpacity: 0.1,
-// 		    });
-
-// 		    newOverlay.setMap(map);
-// 		} else {
-// 		    addGeometries(overlay);
-// 		}
-// 	    });
-// 	}
-
-// 	addGeometries(dz_geojson)
-
-// //	addGeometries(dz_geojson);
-// //	dz_geojson.setMap(map)
-//     });
-// }
-
-// google.maps.event.addDomListener(window, 'load', initmap);
-
-// function initmap() {
-// 	var mapOptions = {
-// 		center: new google.maps.LatLng(55.94, -3.2),
-// 		zoom: 12,
-// 		mapTypeId: google.maps.MapTypeId.ROADMAP
-// 	};
-
-// 	map = new google.maps.Map(document.getElementById("map-canvas"),
-// 				  mapOptions);
-
-//     //initialize district polygons
-//     // for (var district_name in districts) {
-//     // 	var d = districts[district_name];
-//     // 	d.polygon = new google.maps.Polygon({
-//     // 		paths: [],
-//     // 		strokeColor: "#000000",
-//     // 		strokeOpacity: 1,
-//     // 		fillColor: d.colour,
-//     // 		fillOpacity: 0.5
-//     // 	});
-//     // 	d.polygon.setMap(map);
-//     // }
-
-//     getDatazones()
-// 	//google.maps.event.addListener(map,'projection_changed', updatePolygons);
-// }
-
 //calculate Voronoi polygons per district
 function updatePolygons(){
 	var mapNE = map.getBounds().getNorthEast();
@@ -243,17 +166,48 @@ function updatePolygons(){
  * n = nodes (postcodes/neighbourhoods)
  * a = center node (around which the Voronoi polygon will be constructed)
  */
-// function calculateVoronoi(vx, vy, nx, ny, ax, ay) {
-//   for (var i = 0; i < nx.length; i++) {//loop over nodes
-//     //tested point
-//     var bx = nx[i];
-//     var by = ny[i];
-//     //midway point
-//     var cx = (bx + ax) / 2;
-//     var cy = (by + ay) / 2;
-//     //second point on perpendicular bisector
-//     var dx = (ay - cy) + cx;
-//     var dy = (cx - ax) + cy;
+function calculateVoronoi(vx, vy, nx, ny, ax, ay) {
+  for (var i = 0; i < nx.length; i++) {//loop over nodes
+    //tested point
+    var bx = nx[i];
+    var by = ny[i];
+    //midway point
+    var cx = (bx + ax) / 2;
+    var cy = (by + ay) / 2;
+    //second point on perpendicular bisector
+    var dx = (ay - cy) + cx;
+    var dy = (cx - ax) + cy;
+
+    var discarded = [];
+    var j = 0;
+    while (j < vx.length) {//insert intersections and flag deletions
+      var ex = vx[j];
+      var ey = vy[j];
+      var fx = vx[(j+1) % vx.length];
+      var fy = vy[(j+1) % vx.length];
+      var inE = ((dx - cx)*(ey - cy) - (ex - cx)*(dy - cy)) >= 0;
+      var inF = ((dx - cx)*(fy - cy) - (fx - cx)*(dy - cy)) >= 0;
+
+      if (inE && inF) {//E in, F in
+        j++;
+      } else if (inE && !inF) {//E in, F out
+        gx = ((cx*dy - cy*dx)*(ex - fx) - (cx - dx)*(ex*fy - ey*fx)) / ((cx - dx)*(ey - fy) - (cy - dy)*(ex - fx));
+        gy = ((cx*dy - cy*dx)*(ey - fy) - (cy - dy)*(ex*fy - ey*fx)) / ((cx - dx)*(ey - fy) - (cy - dy)*(ex - fx));
+        vx.splice(j+1, 0, gx);
+        vy.splice(j+1, 0, gy);
+        j += 2;
+      } else if (!inE && inF) {//E out, F in
+        gx = ((cx*dy - cy*dx)*(ex - fx) - (cx - dx)*(ex*fy - ey*fx)) / ((cx - dx)*(ey - fy) - (cy - dy)*(ex - fx));
+        gy = ((cx*dy - cy*dx)*(ey - fy) - (cy - dy)*(ex*fy - ey*fx)) / ((cx - dx)*(ey - fy) - (cy - dy)*(ex - fx));
+        vx.splice(j+1, 0, gx);
+        vy.splice(j+1, 0, gy);
+        discarded.push(j);
+        j += 2;
+      } else {//E out, F out
+        discarded.push(j);
+        j++;
+      }
+    }
 
     while (discarded.length != 0) {//discard flagged vertices
       j = discarded.pop();
@@ -281,4 +235,3 @@ function toggleVoronoi(){
 function toggleDatazones(){
     alert("Datazones not yet implemented!");
 }
-
