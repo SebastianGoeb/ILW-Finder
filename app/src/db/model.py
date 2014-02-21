@@ -67,6 +67,7 @@ class Datazone (ndb.Model):
     @classmethod
     def by_code(cls, name):
         return cls.query(cls.code == name)
+<<<<<<< HEAD
 
     @classmethod
     def getDataZones(cls):
@@ -81,6 +82,9 @@ class Datazone (ndb.Model):
             ret.append(results)
         return ret
 
+=======
+            
+>>>>>>> parent of 5aefe10... model merged
 '''class District (ndb.Model):
     name = ndb.StringProperty()
     x_coord = ndb.IntegerProperty()
