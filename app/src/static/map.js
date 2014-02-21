@@ -1,174 +1,233 @@
-var postcode_locations;
-var postcode_neighbourhoods;
-var neighbourhoods = {};
-
-/* A postcode is a house. Every postcode will have an associated district
-   (the "natural neighbourhood"). */
-var nodes = {};
-var districts = {};
-
+var districts = {};//district name -> District()
 var map;
 
-function Node(d) {
-    this.postcode = undefined;
-    this.georef = undefined;
-    this.district = d;
-    this.district_inner_range = [];
-
-    this.infoWindow = new google.maps.InfoWindow({
-        content: d.name,
-    });
-    
-    this.calc_district_inner_range = function() {
-        if (this.district_inner_range.length != 0) {
-            return this.district_inner_range;
-        }
-
-        var out = [];
-
-        for (var n in this.district.nodes) {
-            node = this.district.nodes[n]
-            
-            if (node == this) {
-                continue;
-            }
-
-            out.push(
-                [node,
-                 google.maps.geometry.spherical.computeDistanceBetween(
-                     node.georef, this.georef)]);
-        }
-
-        // sort in ascending range order
-        this.district_inner_range = out.sort(
-            function(a,b) {
-                return a[1] - b[1];
-            }
-        );
-
-        return this.district_inner_range;
-    }
-
-    this.closest_in_district = function(num) {
-        lst = this.calc_district_inner_range();
-
-        num = Math.min(num, lst.length);
-
-        return lst.slice(0,num-1)
-    };
-
-
-    this.drawCircle = function() {
-        var circ = new google.maps.Circle({
-            strokeOpacity: 0.0,
-            fillColor: this.district.colour,
-            fillOpacity: 0.5,
-            map: map,
-            center: this.georef,
-            radius: 100
-        });
-
-        google.maps.event.addListener(circ, 'click', function() {
-            console.log(this);
-            console.log(this.infoWindow);
-            this.infoWindow.open(map, this.georef);
-        });
-    };
-}
-
-current_colour = 0x101010;
 
 function District() {
-    this.nodes = [];
-    this.name = undefined;
-
-    function _nextColour() {
-        current_colour = current_colour + 0xB0;
-        return "#" + current_colour.toString(16);
-    };
-
-    this.colour = _nextColour();
-
-    this.drawInnerPolygons = function() {
-        if (this.nodes.length < 3) {
-            return;
-        }
-
-        for (var n in this.nodes) {
-            vertices = this.nodes[n].closest_in_district(3).map(function(n_) {
-                return n_[0].georef;
-            });
-
-            vertices.push(this.nodes[n].georef)
-
-            new google.maps.Polygon({
-                paths: vertices,
-                strokeOpacity: 0,
-                fillColor: this.colour,
-                fillOpacity: 0.5,
-                map: map
-            });
-        }
-    };
+    this.name;
+    this.colour = "#FF0000";
+    this.pc_coords = [];
+    this.mean_coord = [0.0,0.0];
+    this.polygon;
 }
 
 $.get( "get/district/of-postcodes", function (data) {
-    districts_in = $.parseJSON(data);
-    n_districts = 0
+    var districts_in = $.parseJSON(data);
+	var n_districts = 0
     
+    //construct district_name -> District() map
     for (var pc in districts_in) {
-        district_name = districts_in[pc];
-
-        var d;
+        var district_name = districts_in[pc];
 
         if (!(district_name in districts)) {
-            d = new District();
+        	var d = new District();
             d.name = district_name;
             districts[district_name] = d;
-
             n_districts++;
-        } else {
-            d = districts[district_name];
         }
+    }
 
-        n = new Node(d);
-        n.postcode = pc;
-        d.nodes.push(n);
-
-        nodes[pc] = n;
+    //assign colors to districts along HSL cylinder
+    var district_k = 0;
+    for (var district_name in districts) {
+    	var d = districts[district_name];
+    	var rgb = hslToRgb(district_k / n_districts, 1.0, 0.5);//TODO higher stride mod 1.0 ???
+    	d.colour = "rgba(" + Math.floor(rgb[0]) + ", " + Math.floor(rgb[1]) + ", " + Math.floor(rgb[2]) + ", 1)";
+        district_k++;
     }
     
-    console.log("Found "+n_districts+" districts");
+    console.log("Found " + n_districts + " districts");
 
     $.get("get/georef/of-postcodes", function (data) {
-        coords = $.parseJSON(data);
-        n_nodes = 0
+        var coords = $.parseJSON(data);
+        var n_postcodes = 0;
+
+		//populate districts with pc_coordinates
         for (var pc in coords) {
-            nodes[pc].georef =
-                new google.maps.LatLng(coords[pc][1], coords[pc][0]);
-            n_nodes++
+        	var district_name = districts_in[pc];
+        	if(!district_name || !(district_name in districts)) continue;
+
+        	var d = districts[district_name];
+        	d.pc_coords.push([coords[pc][0], coords[pc][1]]);//1 = lng, 0 = lat
+        	if(district_name == "Myreside") {
+        		console.log(district_name + ": " + coords[pc]);
+        		console.log(district_name + ": " + d.pc_coords[0]);
+        	}
+        	n_postcodes++;
         }
+
+       	console.log("Myreside" + ": " + districts["Myreside"].pc_coords[0]);
+       	console.log(district_name + ": " + districts["Myreside"].mean_coord[0]);
         
-        console.log("Found "+n_nodes+" postcodes");
+        //calculate mean district position
+        for (var district_name in districts) {
+        	var d = districts[district_name];
+        	d.mean_coord_x = 0
+        	d.mean_coord_y = 0
+        	for (var pc_coord in d.pc_coords) {
+        		d.mean_coord[0] += pc_coord[0];
+        		d.mean_coord[1] += pc_coord[1];
+        	}
+        	d.mean_coord[0] /= d.pc_coords.length;
+        	d.mean_coord[1] /= d.pc_coords.length;
+       		console.log(district_name + ": " + districts["Myreside"].pc_coords[0]);
+       		console.log(district_name + ": " + districts["Myreside"].mean_coord[0]);
+        }
+
+        console.log("Found " + n_postcodes + " postcodes");
 
         initmap();
     });
 });
 
-function initmap() {
-    var mapOptions = {
-        center: new google.maps.LatLng(55.94, -3.2),
-        zoom: 12
-    };
-    
-    map = new google.maps.Map(document.getElementById("map-canvas"),
-		                          mapOptions);
+/* Converts an HSL color to an RGB color
+ * h ∈ [0, 1], s ∈ [0, 1], v ∈ [0, 1]
+ *
+ * output will be [r, g, b] where
+ * r ∈ [0, 255], g ∈ [0, 255], b ∈ [0, 255]
+ */
+function hslToRgb(h, s, l){
+    var r, g, b;
 
-    // for (var d in districts) {
-    //     districts[d].drawInnerPolygons();
-    // }
+    if(s == 0){
+        r = g = b = l; // achromatic
+    }else{
+        function hue2rgb(p, q, t){
+            if(t < 0) t += 1;
+            if(t > 1) t -= 1;
+            if(t < 1/6) return p + (q - p) * 6 * t;
+            if(t < 1/2) return q;
+            if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+        }
 
-    for (var n in nodes) {
-        nodes[n].drawCircle();
+        var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        var p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
     }
+
+    return [r * 255, g * 255, b * 255];
+}
+
+function initmap() {
+	var mapOptions = {
+		center: new google.maps.LatLng(55.94, -3.2),
+		zoom: 12,
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	};
+
+	map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+
+    //initialize district polygons
+    for (var district_name in districts) {
+    	var d = districts[district_name];
+    	d.polygon = new google.maps.Polygon({
+    		paths: [],
+    		strokeColor: "#000000",
+    		strokeOpacity: 1,
+    		fillColor: d.colour,
+    		fillOpacity: 0.5
+    	});
+    	d.polygon.setMap(map);
+    }
+	//google.maps.event.addListener(map,'projection_changed', updatePolygons);
+}
+
+//calculate Voronoi polygons per district
+function updatePolygons(){
+	var mapNE = map.getBounds().getNorthEast();
+	var mapSW = map.getBounds().getSouthWest();
+    for (var district_name in districts) {
+    	var d = districts[district_name];
+    	var poly_x = [mapSW.lng(), mapNE.lng(), mapNE.lng(), mapSW.lng()];
+    	var poly_y = [mapSW.lat(), mapSW.lat(), mapNE.lat(), mapNE.lat()];
+    	var districs_x = [];
+    	var districs_y = [];
+    	var this_district_x;
+    	var this_district_y;
+    	for (var other_district_name in districts) {
+    		if (other_district_name == district_name) {
+    			this_district_x = districts[other_district_name].mean_coord[0];
+    			this_district_y = districts[other_district_name].mean_coord[1];
+    		} else {
+    			districs_x.push(districts[other_district_name].mean_coord[0]);
+    			districs_y.push(districts[other_district_name].mean_coord[1]);
+    		}
+    	}
+    	calculateVoronoi(poly_x, poly_y, districs_x, districs_y, this_district_x, this_district_y);
+
+    	var poly_coords = [];
+    	for (var poly_coord_i = 0; poly_coord_i < poly_x.length; poly_coord_i++) {
+    		poly_coords.push(new google.maps.LatLng(poly_y[poly_coord_i], poly_x[poly_coord_i]));
+    	}
+    	d.polygon.setPath(poly_coords);
+    }
+
+    console.log("map bounds:");
+    console.log("mapNE:" + mapNE);
+    console.log("mapSW:" + mapSW);
+
+    /*for (var district_name in districts) {
+    	var d = districts[district_name];
+    	console.log(district_name + ": " + d.mean_coord);
+    	for (var poly_coord in districts[district_name].polygon.getPath().getArray()) {
+    		console.log("\t" + poly_coord);
+    	}
+    }*/
+}
+
+/* v = (starting) vertices of polygon
+ * n = nodes (postcodes/neighbourhoods)
+ * a = center node (around which the Voronoi polygon will be constructed)
+ */
+function calculateVoronoi(vx, vy, nx, ny, ax, ay) {
+  for (var i = 0; i < nx.length; i++) {//loop over nodes
+    //tested point
+    var bx = nx[i];
+    var by = ny[i];
+    //midway point
+    var cx = (bx + ax) / 2;
+    var cy = (by + ay) / 2;
+    //second point on perpendicular bisector
+    var dx = (ay - cy) + cx;
+    var dy = (cx - ax) + cy;
+
+    var discarded = [];
+    var j = 0;
+    while (j < vx.length) {//insert intersections and flag deletions
+      var ex = vx[j];
+      var ey = vy[j];
+      var fx = vx[(j+1) % vx.length];
+      var fy = vy[(j+1) % vx.length];
+      var inE = ((dx - cx)*(ey - cy) - (ex - cx)*(dy - cy)) >= 0;
+      var inF = ((dx - cx)*(fy - cy) - (fx - cx)*(dy - cy)) >= 0;
+
+      if (inE && inF) {//E in, F in
+        j++;
+      } else if (inE && !inF) {//E in, F out
+        gx = ((cx*dy - cy*dx)*(ex - fx) - (cx - dx)*(ex*fy - ey*fx)) / ((cx - dx)*(ey - fy) - (cy - dy)*(ex - fx));
+        gy = ((cx*dy - cy*dx)*(ey - fy) - (cy - dy)*(ex*fy - ey*fx)) / ((cx - dx)*(ey - fy) - (cy - dy)*(ex - fx));
+        vx.splice(j+1, 0, gx);
+        vy.splice(j+1, 0, gy);
+        j += 2;
+      } else if (!inE && inF) {//E out, F in
+        gx = ((cx*dy - cy*dx)*(ex - fx) - (cx - dx)*(ex*fy - ey*fx)) / ((cx - dx)*(ey - fy) - (cy - dy)*(ex - fx));
+        gy = ((cx*dy - cy*dx)*(ey - fy) - (cy - dy)*(ex*fy - ey*fx)) / ((cx - dx)*(ey - fy) - (cy - dy)*(ex - fx));
+        vx.splice(j+1, 0, gx);
+        vy.splice(j+1, 0, gy);
+        discarded.push(j);
+        j += 2;
+      } else {//E out, F out
+        discarded.push(j);
+        j++;
+      }
+    }
+
+    while (discarded.length != 0) {//discard flagged vertices
+      j = discarded.pop();
+      vx.splice(j, 1);
+      vy.splice(j, 1);
+    }
+  }
 }
