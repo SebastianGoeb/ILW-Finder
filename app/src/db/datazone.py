@@ -168,3 +168,10 @@ def update_pop():
                 n_pop += 1
                 z.put()
     logging.info("Done. Altered %i entries."%(n_pop))
+    datazones = Datazone.query().fetch()
+    for dz in datazones:
+        postcodes = Postcodes.query(
+            Postcodes.datazone == dz.key).fetch()
+        dz.num_postcodes = len(postcodes)
+        dz.put()
+    logging.info("Updated postcode counts")
