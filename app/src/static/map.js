@@ -1,57 +1,14 @@
 var districts = {};//district name -> District()
 var map;
+var infoWindow;
+var voronoi_visible = false;
 
-hues = {}
-
-$.get('get/nn-hues/of-datazones', function(data) {
-    hues_in = $.parseJSON(data);
-    for (var dz in hues_in) {
-	hues["S0"+dz.toString()] = rgbStrFromArray(hslToRgb(hues_in[dz],
-							   0.5, 0.5))
-    }
-
-    intro()
-});
-
-
-
-function intro() {
-    var width = 960, height = 1160;
-    
-    var projection = d3.geo.albers()
-	.center([0.795, 55.89])
-	.rotate([4.4, 0])
-	.parallels([50, 60])
-	.scale(180000)
-	.translate([width / 20, height / 3]);
-
-    var path = d3.geo.path()
-	.projection(projection);
-
-    var svg = d3.select("body").append("svg")
-	.attr("width", width)
-	.attr("height", height);
-
-
-    d3.json("static/edin_topo.json", function(error, data) {
-	svg.selectAll(".geometries")
-	    .data(topojson.feature(data, data.objects.S12000036_geo).features)
-	    .enter().append("path")
-	    .attr("style", function(d) {
-		offer = hues[d.properties.gss]
-		if (offer == '#bf3f3f') {
-		    return "fill:#505050"
-		} else {
-		    return "fill:"+offer
-		}
-	    })
-	    .attr("d", path);
-	// svg.append("path")
-	//     .datum(topojson.mesh(data, data.objects['S12000036_geo'],
-	// 			function(a,b){return a == b}))
-	//     .attr("id", "council_area")
-	//     .attr("d", path);
-    });
+function District() {
+    this.name;
+    this.colour = "#FF0000";
+    this.pc_coords = [];
+    this.mean_coord = [0, 0];
+    this.polygon;
 }
 
 // function District() {
@@ -87,43 +44,33 @@ function intro() {
 //         district_k++;
 //     }
     
-//     console.log("Found " + n_districts + " districts");
+    console.log("Found " + n_districts + " districts");
 
-//     $.get("get/georef/of-postcodes", function (data) {
-//         var coords = $.parseJSON(data);
-//         var n_postcodes = 0;
+    $.get("get/georef/of-postcodes", function (data) {
+        var coords = $.parseJSON(data);
+        var n_postcodes = 0;
 
-// 		//populate districts with pc_coordinates
-//         for (var pc in coords) {
-//         	var district_name = districts_in[pc];
-//         	if(!district_name || !(district_name in districts)) continue;
+		//populate districts with pc_coordinates
+        for (var pc in coords) {
+        	var district_name = districts_in[pc];
+        	if(!district_name || !(district_name in districts)) continue;
 
-//         	var d = districts[district_name];
-//         	d.pc_coords.push([coords[pc][0], coords[pc][1]]);//1 = lng, 0 = lat
-//         	if(district_name == "Myreside") {
-//         		console.log(district_name + ": " + coords[pc]);
-//         		console.log(district_name + ": " + d.pc_coords[0]);
-//         	}
-//         	n_postcodes++;
-//         }
-
-//        	console.log("Myreside" + ": " + districts["Myreside"].pc_coords[0]);
-//        	console.log(district_name + ": " + districts["Myreside"].mean_coord[0]);
+        	var d = districts[district_name];
+        	d.pc_coords.push([coords[pc][0], coords[pc][1]]);//1 = lng, 0 = lat
+        	n_postcodes++;
+        }
         
-//         //calculate mean district position
-//         for (var district_name in districts) {
-//         	var d = districts[district_name];
-//         	d.mean_coord_x = 0
-//         	d.mean_coord_y = 0
-//         	for (var pc_coord in d.pc_coords) {
-//         		d.mean_coord[0] += pc_coord[0];
-//         		d.mean_coord[1] += pc_coord[1];
-//         	}
-//         	d.mean_coord[0] /= d.pc_coords.length;
-//         	d.mean_coord[1] /= d.pc_coords.length;
-//        		console.log(district_name + ": " + districts["Myreside"].pc_coords[0]);
-//        		console.log(district_name + ": " + districts["Myreside"].mean_coord[0]);
-//         }
+        //calculate mean district position
+        for (var district_name in districts) {
+        	var d = districts[district_name];
+        	for (var i = 0; i < d.pc_coords.length; i++) {
+        		var pc_coord = d.pc_coords[i];
+        		d.mean_coord[0] += pc_coord[0];
+        		d.mean_coord[1] += pc_coord[1];
+        	}
+        	d.mean_coord[0] /= d.pc_coords.length;
+        	d.mean_coord[1] /= d.pc_coords.length;
+        }
 
 //         console.log("Found " + n_postcodes + " postcodes");
 
@@ -161,11 +108,34 @@ function hslToRgb(h, s, l){
     return [r * 255, g * 255, b * 255];
 }
 
-function rgbStrFromArray(arr) {
-    return ('#'
-	    + parseInt(arr[0]).toString(16)
-	    + parseInt(arr[1]).toString(16)
-	    + parseInt(arr[2]).toString(16))
+function initmap() {
+	var mapOptions = {
+		center: new google.maps.LatLng(55.94, -3.2),
+		zoom: 12,
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	};
+
+	map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+	infoWindow = new google.maps.InfoWindow();
+
+
+    //initialize district polygons
+    for (var district_name in districts) {
+    	var d = districts[district_name];
+    	d.polygon = new google.maps.Polygon({
+    		paths: [],
+    		strokeColor: "#000000",
+    		strokeOpacity: 0.5,
+    		strokeWeight: 1,
+    		fillColor: d.colour,
+    		fillOpacity: 0.05,
+            visible: voronoi_visible,
+    		district: district_name
+    	});
+    	d.polygon.setMap(map);
+  		google.maps.event.addListener(d.polygon, 'click', showDistrict);
+    }
+	google.maps.event.addListener(map,'bounds_changed', updatePolygons);
 }
 
 // function getDatazones() {
@@ -239,47 +209,35 @@ function rgbStrFromArray(arr) {
 // }
 
 //calculate Voronoi polygons per district
-// function updatePolygons(){
-// 	var mapNE = map.getBounds().getNorthEast();
-// 	var mapSW = map.getBounds().getSouthWest();
-//     for (var district_name in districts) {
-//     	var d = districts[district_name];
-//     	var poly_x = [mapSW.lng(), mapNE.lng(), mapNE.lng(), mapSW.lng()];
-//     	var poly_y = [mapSW.lat(), mapSW.lat(), mapNE.lat(), mapNE.lat()];
-//     	var districs_x = [];
-//     	var districs_y = [];
-//     	var this_district_x;
-//     	var this_district_y;
-//     	for (var other_district_name in districts) {
-//     		if (other_district_name == district_name) {
-//     			this_district_x = districts[other_district_name].mean_coord[0];
-//     			this_district_y = districts[other_district_name].mean_coord[1];
-//     		} else {
-//     			districs_x.push(districts[other_district_name].mean_coord[0]);
-//     			districs_y.push(districts[other_district_name].mean_coord[1]);
-//     		}
-//     	}
-//     	calculateVoronoi(poly_x, poly_y, districs_x, districs_y, this_district_x, this_district_y);
+function updatePolygons(){
+	var mapNE = map.getBounds().getNorthEast();
+	var mapSW = map.getBounds().getSouthWest();
+    for (var district_name in districts) {
+    	var d = districts[district_name];
+    	var poly_x = [mapSW.lng(), mapNE.lng(), mapNE.lng(), mapSW.lng()];
+    	var poly_y = [mapSW.lat(), mapSW.lat(), mapNE.lat(), mapNE.lat()];
+    	var districs_x = [];
+    	var districs_y = [];
+    	var this_district_x;
+    	var this_district_y;
+    	for (var other_district_name in districts) {
+    		if (other_district_name == district_name) {
+    			this_district_x = districts[other_district_name].mean_coord[0];
+    			this_district_y = districts[other_district_name].mean_coord[1];
+    		} else {
+    			districs_x.push(districts[other_district_name].mean_coord[0]);
+    			districs_y.push(districts[other_district_name].mean_coord[1]);
+    		}
+    	}
+    	calculateVoronoi(poly_x, poly_y, districs_x, districs_y, this_district_x, this_district_y);
 
-//     	var poly_coords = [];
-//     	for (var poly_coord_i = 0; poly_coord_i < poly_x.length; poly_coord_i++) {
-//     		poly_coords.push(new google.maps.LatLng(poly_y[poly_coord_i], poly_x[poly_coord_i]));
-//     	}
-//     	d.polygon.setPath(poly_coords);
-//     }
-
-//     console.log("map bounds:");
-//     console.log("mapNE:" + mapNE);
-//     console.log("mapSW:" + mapSW);
-
-//     /*for (var district_name in districts) {
-//     	var d = districts[district_name];
-//     	console.log(district_name + ": " + d.mean_coord);
-//     	for (var poly_coord in districts[district_name].polygon.getPath().getArray()) {
-//     		console.log("\t" + poly_coord);
-//     	}
-//     }*/
-// }
+    	var poly_coords = [];
+    	for (var poly_coord_i = 0; poly_coord_i < poly_x.length; poly_coord_i++) {
+    		poly_coords.push(new google.maps.LatLng(poly_y[poly_coord_i], poly_x[poly_coord_i]));
+    	}
+    	d.polygon.setPath(poly_coords);
+    }
+}
 
 /* v = (starting) vertices of polygon
  * n = nodes (postcodes/neighbourhoods)
@@ -297,41 +255,30 @@ function rgbStrFromArray(arr) {
 //     var dx = (ay - cy) + cx;
 //     var dy = (cx - ax) + cy;
 
-//     var discarded = [];
-//     var j = 0;
-//     while (j < vx.length) {//insert intersections and flag deletions
-//       var ex = vx[j];
-//       var ey = vy[j];
-//       var fx = vx[(j+1) % vx.length];
-//       var fy = vy[(j+1) % vx.length];
-//       var inE = ((dx - cx)*(ey - cy) - (ex - cx)*(dy - cy)) >= 0;
-//       var inF = ((dx - cx)*(fy - cy) - (fx - cx)*(dy - cy)) >= 0;
+    while (discarded.length != 0) {//discard flagged vertices
+      j = discarded.pop();
+      vx.splice(j, 1);
+      vy.splice(j, 1);
+    }
+  }
+}
 
-//       if (inE && inF) {//E in, F in
-//         j++;
-//       } else if (inE && !inF) {//E in, F out
-//         gx = ((cx*dy - cy*dx)*(ex - fx) - (cx - dx)*(ex*fy - ey*fx)) / ((cx - dx)*(ey - fy) - (cy - dy)*(ex - fx));
-//         gy = ((cx*dy - cy*dx)*(ey - fy) - (cy - dy)*(ex*fy - ey*fx)) / ((cx - dx)*(ey - fy) - (cy - dy)*(ex - fx));
-//         vx.splice(j+1, 0, gx);
-//         vy.splice(j+1, 0, gy);
-//         j += 2;
-//       } else if (!inE && inF) {//E out, F in
-//         gx = ((cx*dy - cy*dx)*(ex - fx) - (cx - dx)*(ex*fy - ey*fx)) / ((cx - dx)*(ey - fy) - (cy - dy)*(ex - fx));
-//         gy = ((cx*dy - cy*dx)*(ey - fy) - (cy - dy)*(ex*fy - ey*fx)) / ((cx - dx)*(ey - fy) - (cy - dy)*(ex - fx));
-//         vx.splice(j+1, 0, gx);
-//         vy.splice(j+1, 0, gy);
-//         discarded.push(j);
-//         j += 2;
-//       } else {//E out, F out
-//         discarded.push(j);
-//         j++;
-//       }
-//     }
+function showDistrict(event) {
+	var d = districts[this.district];
+	infoWindow.setContent(d.name + "<br/>lat: " + d.mean_coord[1] + "<br/>lng: " + d.mean_coord[0]);
+	infoWindow.setPosition(new google.maps.LatLng(d.mean_coord[1], d.mean_coord[0]));
+	infoWindow.open(map);
+}
 
-//     while (discarded.length != 0) {//discard flagged vertices
-//       j = discarded.pop();
-//       vx.splice(j, 1);
-//       vy.splice(j, 1);
-//     }
-//   }
-// }
+function toggleVoronoi(){
+    voronoi_visible = !voronoi_visible;
+    for (var district_name in districts) {
+        var d = districts[district_name];
+        d.polygon.setVisible(voronoi_visible);
+    }
+}
+
+function toggleDatazones(){
+    alert("Datazones not yet implemented!");
+}
+

@@ -27,6 +27,14 @@ def index():
                            ref2 = GridRef.fromGeoRef(GeoRef(55.96216931484757, -3.198603458349107)),
                            lat = 55.95, lon = -3.2,
                            postcode = "EH1 1LY")
+
+@app.route('/gamma')
+def index_gamma():
+    return render_template("head2.html",
+                           ref2 = GridRef.fromGeoRef(GeoRef(55.96216931484757, -3.198603458349107)),
+                           lat = 55.95, lon = -3.2,
+                           postcode = "EH1 1LY")
+    
 # @app.route('/updatedb/dz/<indicator>')
 # def route_updatedb_dz():
 #     return

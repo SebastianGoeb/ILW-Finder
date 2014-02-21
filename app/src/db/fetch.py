@@ -62,8 +62,7 @@ def get_popOfPc():
 def get_distOfPc():
     data = model.Postcodes.get().fetch()
     def f_(x):
-        districts = x.districts
-        return districts[0].get().name
+        return x.districts[0].get().name
     data = {x.postcode: f_(x) for x in data}
     return retJson(data)
         
