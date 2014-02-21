@@ -1,17 +1,19 @@
+<!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
-    <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-
-    <title>ILW-Finder</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+      html { height: 100% }
+      body { height: 100%; margin: 0; padding: 0 }
+      #map-canvas { height: 100% }
+    </style>
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDzM6vnoSDzw6Z5sGtMDtwZ5TD4SU5ljGc&sensor=false&libraries=geometry">
+    </script>
+    <script type="text/javascript" src="static/map.js"></script>
   </head>
   <body>
-    <h1>Hello Edinburgh Neighbourhoods! {{ ref2.x }} {{ ref2.y }}</h1>
-    <!-- <p>The coordinates of the first entry ({{ postcode }}) are: ({{ lat }}E, {{ lon }}N)</p> -->
-    <div id="map">
-    </div>
-    <script type="text/javascript" src="{{ url_for('static',  filename='map.js') }}"></script>
+    <div id="map-canvas"/>
   </body>
 </html>
