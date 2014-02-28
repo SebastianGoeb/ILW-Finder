@@ -22,7 +22,7 @@ An interactive map to determine communities/natural neighbourhoods in Edinburgh 
 ###### Local review ([http://localhost:8080](http://localhost:8080))
 > make demo
 
-###### Deploy to Google App Engine [http://ilw-finder.appspot.com/](http://ilw-finder.appspot.com/)
+###### Deploy to Google App Engine (incomplete) [http://ilw-finder.appspot.com/](http://ilw-finder.appspot.com/)
 > make push
 
 
